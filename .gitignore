@@ -1,0 +1,15 @@
+# Virtual environments
+.venv/
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Packaging artifacts
+*.egg-info/
+dist/
+build/
+
+# OS junk
+.DS_Store
