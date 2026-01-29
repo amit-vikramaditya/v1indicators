@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "v1indicators"
+version = "0.0.1"
+description = "Technical analysis indicators and scanners"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "V1"}
+authors = [
+    {name = "Amit"}
+]
+
+dependencies = []
+
+[tool.setuptools.packages.find]
+where = ["."]
