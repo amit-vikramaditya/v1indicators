@@ -1,4 +1,5 @@
 import pandas as pd
+import numpy as np
 
 
 def adx(
@@ -19,10 +20,15 @@ def adx(
 
     # --- True Range ---
     tr = pd.concat(
-        [high - low, (high - prev_close).abs(), (low - prev_close).abs()],
+        [
+            high - low,
+            (high - prev_close).abs(),
+            (low - prev_close).abs(),
+        ],
         axis=1,
     ).max(axis=1)
 
+    # Wilder ATR (RMA)
     atr = tr.ewm(alpha=1 / length, adjust=False).mean()
 
     # --- Directional Movement ---
@@ -35,19 +41,25 @@ def adx(
     plus_dm_smoothed = plus_dm.ewm(alpha=1 / length, adjust=False).mean()
     minus_dm_smoothed = minus_dm.ewm(alpha=1 / length, adjust=False).mean()
 
-    atr_safe = atr.replace(0, pd.NA)
+    # --- Directional Indicators ---
+    # IMPORTANT: use np.nan, NOT pd.NA
+    atr_safe = atr.replace(0.0, np.nan)
 
-    plus_di = 100 * (plus_dm_smoothed / atr_safe)
-    minus_di = 100 * (minus_dm_smoothed / atr_safe)
+    plus_di = 100.0 * (plus_dm_smoothed / atr_safe)
+    minus_di = 100.0 * (minus_dm_smoothed / atr_safe)
 
-    denom = (plus_di + minus_di).replace(0, pd.NA)
-    dx = 100 * (plus_di - minus_di).abs() / denom
+    # --- DX ---
+    denom = (plus_di + minus_di).replace(0.0, np.nan)
+    dx = 100.0 * (plus_di - minus_di).abs() / denom
 
+    # --- ADX ---
     adx = dx.ewm(alpha=1 / length, adjust=False).mean()
 
-    return pd.DataFrame({
-        "adx": adx,
-        "plus_di": plus_di,
-        "minus_di": minus_di,
-    })
+    return pd.DataFrame(
+        {
+            "adx": adx,
+            "plus_di": plus_di,
+            "minus_di": minus_di,
+        }
+    )
 
