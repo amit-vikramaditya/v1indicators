@@ -1,7 +1,5 @@
 # v1indicators
 
-**Engineering over Hype.**
-
 `v1indicators` is a professional-grade, high-performance technical analysis library for Python. It is designed to be the "Standard Library" for financial indicators—prioritizing mathematical accuracy, system stability, and zero external bloat.
 
 It is a pure calculation engine. It does not trade, it does not plot, and it does not make promises. It just does the math.
