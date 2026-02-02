@@ -1,14 +1,14 @@
 # overlap
-from .overlap import ema, bbands, donchian, keltner, ichimoku
+from .overlap import sma, ema, wma, rma, bbands, donchian, keltner, ichimoku
 
 # momentum
-from .momentum import rsi, macd, stochastic
+from .momentum import rsi, macd, stochastic, roc, mfi, cci
 
 # volatility
 from .volatility import atr
 
 # trend
-from .trend import adx, supertrend
+from .trend import adx, supertrend, psar
 
 # volume
 from .volume import obv, vwap
@@ -18,7 +18,10 @@ from .levels import fibonacci
 
 __all__ = [
     # overlap
+    "sma",
     "ema",
+    "wma",
+    "rma",
     "bbands",
     "donchian",
     "keltner",
@@ -28,6 +31,9 @@ __all__ = [
     "rsi",
     "macd",
     "stochastic",
+    "roc",
+    "mfi",
+    "cci",
 
     # volatility
     "atr",
@@ -35,6 +41,7 @@ __all__ = [
     # trend
     "adx",
     "supertrend",
+    "psar",
 
     # volume
     "obv",

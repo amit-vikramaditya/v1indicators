@@ -4,16 +4,32 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "v1indicators"
-version = "0.0.1"
-description = "Technical analysis indicators and scanners"
+version = "0.1.0"
+description = "Technical analysis indicators and scanners. Engineering over Hype."
 readme = "README.md"
 requires-python = ">=3.9"
-license = {text = "V1"}
+license = {text = "MIT"}
 authors = [
     {name = "Amit"}
 ]
 
-dependencies = []
+dependencies = [
+    "numpy>=1.20.0",
+    "pandas>=2.0.0"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0"
+]
 
 [tool.setuptools.packages.find]
 where = ["."]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+testpaths = [
+    "tests",
+]
