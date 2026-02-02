@@ -1,7 +1,7 @@
 import pandas as pd
 from ..overlap.ema import ema
 from ..volatility.atr import atr
-
+from .._utils import check_series
 
 def keltner(
     high: pd.Series,
@@ -13,11 +13,12 @@ def keltner(
 ) -> pd.DataFrame:
     """Keltner Channels (EMA ± ATR bands)."""
 
-    if not all(isinstance(x, pd.Series) for x in (high, low, close)):
-        raise TypeError("high, low, close must be pandas Series")
-
     if min(length, atr_length) <= 0:
         raise ValueError("lengths must be > 0")
+
+    high = check_series(high, "high")
+    low = check_series(low, "low")
+    close = check_series(close, "close")
 
     mid = ema(close, length)
     atr_v = atr(high, low, close, atr_length)
@@ -26,8 +27,8 @@ def keltner(
     lower = mid - mult * atr_v
 
     return pd.DataFrame({
-        "keltner_mid": mid,
-        "keltner_upper": upper,
-        "keltner_lower": lower,
+        "KELTNER_MID": mid,
+        "KELTNER_UPPER": upper,
+        "KELTNER_LOWER": lower,
     })
 
