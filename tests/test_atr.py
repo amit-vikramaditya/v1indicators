@@ -1,6 +1,4 @@
 import pandas as pd
-import numpy as np
-import pytest
 from v1indicators.volatility.atr import atr
 
 def test_atr_basic():

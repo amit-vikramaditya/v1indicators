@@ -1,6 +1,4 @@
 import pandas as pd
-import numpy as np
-import pytest
 from v1indicators.overlap.ema import ema
 
 def test_ema_basic():

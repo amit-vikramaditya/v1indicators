@@ -50,9 +50,9 @@ def supertrend(
     lower_band_basic = hl2 - mult * atr_v
     
     # Convert to NumPy for the loop (Critical for performance)
-    close_val = close.values
-    upper_basic = upper_band_basic.values
-    lower_basic = lower_band_basic.values
+    close_val = close.to_numpy()
+    upper_basic = upper_band_basic.to_numpy()
+    lower_basic = lower_band_basic.to_numpy()
     
     length_data = len(close)
     st = np.full(length_data, np.nan)

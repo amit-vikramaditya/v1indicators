@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import pytest
 from v1indicators import (
-    sma, ema, rsi, macd, supertrend, bbands, keltner, 
+    ema, rsi, macd, supertrend, bbands, keltner, 
     adx, psar, mfi, cci, vwap
 )
 

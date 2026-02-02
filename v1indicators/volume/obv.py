@@ -7,7 +7,7 @@ def obv(close: pd.Series, volume: pd.Series) -> pd.Series:
     close = check_series(close, "close")
     volume = check_series(volume, "volume")
 
-    direction = np.sign(close.diff())
+    direction = pd.Series(np.sign(close.diff()), index=close.index)
     # If direction is NaN (first), fill 0
     # If direction is 0, volume is ignored (0 * vol = 0)
     

@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-import pytest
 from v1indicators.momentum.rsi import rsi
 
 def test_rsi_basic():

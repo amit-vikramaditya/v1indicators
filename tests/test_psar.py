@@ -1,5 +1,4 @@
 import pandas as pd
-import pytest
 from v1indicators.trend.psar import psar
 
 def test_psar_basic():
