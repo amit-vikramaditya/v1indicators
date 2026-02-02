@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
-
+from .._utils import check_series
+from ..overlap.rma import rma
 
 def adx(
     high: pd.Series,
@@ -9,41 +10,43 @@ def adx(
     length: int = 14,
 ) -> pd.DataFrame:
     """Average Directional Index (ADX) using Wilder's method."""
-
-    if not all(isinstance(x, pd.Series) for x in (high, low, close)):
-        raise TypeError("high, low, close must be pandas Series")
-
+    
     if length <= 0:
         raise ValueError("length must be > 0")
+
+    high = check_series(high, "high")
+    low = check_series(low, "low")
+    close = check_series(close, "close")
 
     prev_close = close.shift()
 
     # --- True Range ---
-    tr = pd.concat(
-        [
-            high - low,
-            (high - prev_close).abs(),
-            (low - prev_close).abs(),
-        ],
-        axis=1,
-    ).max(axis=1)
+    tr1 = high - low
+    tr2 = (high - prev_close).abs()
+    tr3 = (low - prev_close).abs()
+    tr = pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
 
     # Wilder ATR (RMA)
-    atr = tr.ewm(alpha=1 / length, adjust=False).mean()
+    atr_val = rma(tr, length)
 
     # --- Directional Movement ---
     up_move = high.diff()
     down_move = -low.diff()
 
+    # Determine Plus DM and Minus DM
+    # If up_move > down_move and up_move > 0 -> +DM = up_move, else 0
     plus_dm = up_move.where((up_move > down_move) & (up_move > 0), 0.0)
+    
+    # If down_move > up_move and down_move > 0 -> -DM = down_move, else 0
     minus_dm = down_move.where((down_move > up_move) & (down_move > 0), 0.0)
 
-    plus_dm_smoothed = plus_dm.ewm(alpha=1 / length, adjust=False).mean()
-    minus_dm_smoothed = minus_dm.ewm(alpha=1 / length, adjust=False).mean()
+    # Smooth DM
+    plus_dm_smoothed = rma(plus_dm, length)
+    minus_dm_smoothed = rma(minus_dm, length)
 
     # --- Directional Indicators ---
-    # IMPORTANT: use np.nan, NOT pd.NA
-    atr_safe = atr.replace(0.0, np.nan)
+    # Safe division
+    atr_safe = atr_val.replace(0.0, np.nan)
 
     plus_di = 100.0 * (plus_dm_smoothed / atr_safe)
     minus_di = 100.0 * (minus_dm_smoothed / atr_safe)
@@ -53,13 +56,15 @@ def adx(
     dx = 100.0 * (plus_di - minus_di).abs() / denom
 
     # --- ADX ---
-    adx = dx.ewm(alpha=1 / length, adjust=False).mean()
+    # ADX is the RMA of DX (smoothed DX)
+    adx_val = rma(dx, length)
 
     return pd.DataFrame(
         {
-            "adx": adx,
-            "plus_di": plus_di,
-            "minus_di": minus_di,
-        }
+            f"ADX_{length}": adx_val,
+            f"DMP_{length}": plus_di,
+            f"DMN_{length}": minus_di,
+        },
+        index=close.index
     )
 

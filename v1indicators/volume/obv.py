@@ -1,14 +1,17 @@
 import pandas as pd
 import numpy as np
-
+from .._utils import check_series
 
 def obv(close: pd.Series, volume: pd.Series) -> pd.Series:
     """On-Balance Volume (OBV)."""
-
-    if not all(isinstance(x, pd.Series) for x in (close, volume)):
-        raise TypeError("close and volume must be pandas Series")
+    close = check_series(close, "close")
+    volume = check_series(volume, "volume")
 
     direction = np.sign(close.diff())
-
-    return (volume * direction.fillna(0)).cumsum()
+    # If direction is NaN (first), fill 0
+    # If direction is 0, volume is ignored (0 * vol = 0)
+    
+    obv_val = (volume * direction.fillna(0)).cumsum()
+    obv_val.name = "OBV"
+    return obv_val
 

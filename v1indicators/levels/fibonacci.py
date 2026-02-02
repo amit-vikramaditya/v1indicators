@@ -1,3 +1,5 @@
+from typing import Tuple, Dict, Union, Optional
+
 DEFAULT_RATIOS = (
     0.0,
     0.236,
@@ -10,12 +12,11 @@ DEFAULT_RATIOS = (
     1.618,
 )
 
-
 def fibonacci(
-    high: float | int,
-    low: float | int,
-    ratios: tuple[float, ...] | None = None,
-) -> dict[float, float]:
+    high: Union[float, int],
+    low: Union[float, int],
+    ratios: Optional[Tuple[float, ...]] = None,
+) -> Dict[float, float]:
     """Fibonacci price levels between two anchors."""
 
     if ratios is None:
