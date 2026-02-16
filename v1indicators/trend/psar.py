@@ -1,39 +1,21 @@
 import pandas as pd
 import numpy as np
+from numba import njit
 from .._utils import check_series
 
-def psar(
-    high: pd.Series,
-    low: pd.Series,
-    acceleration: float = 0.02,
-    maximum: float = 0.2,
-) -> pd.DataFrame:
-    """
-    Parabolic Stop and Reverse (PSAR).
-    
-    A trend-following indicator that uses an accelerating factor to trail stops.
-    """
-    high_s = check_series(high, "high")
-    low_s = check_series(low, "low")
-    
-    high_v = high_s.values
-    low_v = low_s.values
-    
+@njit
+def _psar_kernel(high_v, low_v, acceleration, maximum):
     length = len(high_v)
     psar_v = np.full(length, np.nan)
     psar_dir = np.zeros(length, dtype=np.int8)  # 1 for bull, -1 for bear
     
     if length < 2:
-        return pd.DataFrame({
-            "PSAR": psar_v,
-            "PSAR_DIR": psar_dir
-        }, index=high_s.index)
+        return psar_v, psar_dir
 
     # Initial values
     bull = True
-    psar_dir[0] = 1
     
-    # We need a starting point. Standard is to look at first two bars.
+    # Starting point
     if high_v[1] > high_v[0] or low_v[1] > low_v[0]:
         bull = True
         psar_v[1] = low_v[0]
@@ -82,6 +64,27 @@ def psar(
                 psar_v[i] = max(psar_v[i], high_v[i-1], high_v[i-2])
                 
         psar_dir[i] = 1 if bull else -1
+        
+    return psar_v, psar_dir
+
+def psar(
+    high: pd.Series,
+    low: pd.Series,
+    acceleration: float = 0.02,
+    maximum: float = 0.2,
+) -> pd.DataFrame:
+    """
+    Parabolic Stop and Reverse (PSAR). (Numba Optimized)
+    
+    A trend-following indicator that uses an accelerating factor to trail stops.
+    """
+    high_s = check_series(high, "high")
+    low_s = check_series(low, "low")
+    
+    high_v = high_s.to_numpy()
+    low_v = low_s.to_numpy()
+    
+    psar_v, psar_dir = _psar_kernel(high_v, low_v, acceleration, maximum)
 
     return pd.DataFrame({
         "PSAR": psar_v,
