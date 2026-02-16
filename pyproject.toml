@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "v1indicators"
-version = "0.1.0"
-description = "Technical analysis indicators and scanners. Engineering over Hype."
+version = "0.2.0"
+description = "Technical analysis indicators and scanners."
 readme = "README.md"
 requires-python = ">=3.9"
 license = {text = "MIT"}
@@ -15,7 +15,8 @@ authors = [
 
 dependencies = [
     "numpy>=1.20.0",
-    "pandas>=2.0.0"
+    "pandas>=2.0.0",
+    "numba>=0.56.0"
 ]
 
 [project.optional-dependencies]
@@ -26,6 +27,8 @@ dev = [
 
 [tool.setuptools.packages.find]
 where = ["."]
+include = ["v1indicators*"]
+exclude = ["v1backtest*", "tests*"]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
