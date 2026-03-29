@@ -28,6 +28,10 @@ from .short_run import short_run
 from .amat import amat
 from .td_seq import td_seq
 from .ttm_trend import ttm_trend
+from .dual_score_signals import dual_score_signals
+from .precision_confluence import precision_confluence
+from .htf_reversal_divergence import htf_reversal_divergence
+from .range_filter_confluence import range_filter_confluence
 
 __all__ = [
     "adx",
@@ -63,5 +67,9 @@ __all__ = [
     "amat",
     "td_seq",
     "ttm_trend",
+    "dual_score_signals",
+    "precision_confluence",
+    "htf_reversal_divergence",
+    "range_filter_confluence",
 ]
 

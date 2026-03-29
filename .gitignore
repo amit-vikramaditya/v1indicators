@@ -19,10 +19,11 @@ build/
 from tradingview/
 reports/
 
-# GitHub metadata
-.github/
-
 # Ignore all dot-prefixed files/directories by default
 .*
 !.git/
 !.gitignore
+!.github/
+.github/*
+!.github/workflows/
+!.github/workflows/**

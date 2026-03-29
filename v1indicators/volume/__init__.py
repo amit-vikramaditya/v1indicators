@@ -17,6 +17,7 @@ from .pvr import pvr
 from .pvt import pvt
 from .vp import vp
 from .aobv import aobv
+from .swing_leg_profile import swing_leg_profile
 
 __all__ = [
     "obv",
@@ -38,5 +39,6 @@ __all__ = [
     "pvt",
     "vp",
     "aobv",
+    "swing_leg_profile",
 ]
 

@@ -158,6 +158,10 @@ TREND_SYMBOLS = (
     "amat",
     "td_seq",
     "ttm_trend",
+    "dual_score_signals",
+    "precision_confluence",
+    "htf_reversal_divergence",
+    "range_filter_confluence",
 )
 
 VOLUME_SYMBOLS = (
@@ -180,6 +184,7 @@ VOLUME_SYMBOLS = (
     "pvt",
     "vp",
     "aobv",
+    "swing_leg_profile",
 )
 
 LEVELS_SYMBOLS = (

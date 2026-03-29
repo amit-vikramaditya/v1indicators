@@ -89,6 +89,12 @@ Run the full test suite:
 pytest
 ```
 
+Run the cross-indicator interoperability quality gate:
+
+```bash
+pytest -q tests/test_interoperability_matrix.py
+```
+
 ## License
 
 MIT
