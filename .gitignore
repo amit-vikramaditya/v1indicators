@@ -16,3 +16,11 @@ build/
 
 # Local scratch and audit artifacts
 .tmp/
+
+# GitHub metadata
+.github/
+
+# Ignore all dot-prefixed files/directories by default
+.*
+!.git/
+!.gitignore
