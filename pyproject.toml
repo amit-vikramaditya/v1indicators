@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "v1indicators"
-dynamic = ["version"]
+version = "0.2.2"
 description = "Technical analysis indicators and scanners."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -49,9 +49,6 @@ Issues = "https://github.com/amit-vikramaditya/v1indicators/issues"
 where = ["."]
 include = ["v1indicators*"]
 exclude = ["v1backtest*", "tests*"]
-
-[tool.setuptools.dynamic]
-version = {attr = "v1indicators._version.__version__"}
 
 [tool.pytest.ini_options]
 minversion = "6.0"
