@@ -1,12 +1,13 @@
 import pandas as pd
 from .._utils import check_series
-from ..overlap.rma import rma
 
 def atr(
     high: pd.Series,
     low: pd.Series,
     close: pd.Series,
     length: int = 14,
+    mamode: str = "ema",
+    drift: int = 1,
 ) -> pd.Series:
     """
     Average True Range (ATR).
@@ -30,12 +31,14 @@ def atr(
     
     if length <= 0:
         raise ValueError("length must be > 0")
+    if drift <= 0:
+        raise ValueError("drift must be > 0")
         
     high = check_series(high, "high")
     low = check_series(low, "low")
     close = check_series(close, "close")
 
-    prev_close = close.shift()
+    prev_close = close.shift(drift)
 
     # Calculate True Range
     tr1 = high - low
@@ -44,8 +47,13 @@ def atr(
     
     tr = pd.concat([tr1, tr2, tr3], axis=1).max(axis=1)
 
-    # Wilder's Smoothing
-    result = rma(tr, length)
+    min_periods = length
+    mode = mamode.lower() if mamode else "ema"
+    if mode == "sma":
+        result = tr.rolling(length, min_periods=min_periods).mean()
+    else:
+        result = tr.ewm(span=length, min_periods=min_periods, adjust=True).mean()
+
     result.name = f"ATR_{length}"
     return result
 

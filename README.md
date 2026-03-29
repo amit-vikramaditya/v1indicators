@@ -1,102 +1,91 @@
 # v1indicators
 
-`v1indicators` is a professional-grade, high-performance technical analysis library for Python. It is designed to be the "Standard Library" for financial indicators—prioritizing mathematical accuracy, system stability, and zero external bloat.
+v1indicators is a fast, production-focused technical analysis library for Python.
 
-It is a pure calculation engine. It does not trade, it does not plot, and it does not make promises. It just does the math.
+It provides a clean functional API for indicator calculations and keeps scope intentionally narrow:
+- no charting
+- no broker integrations
+- no strategy execution framework
 
-## The Philosophy
+The goal is simple: reliable indicator math on top of pandas Series/DataFrame inputs.
 
-Existing libraries (`ta-lib`, `pandas-ta`, `ta`) often suffer from one of three problems: dependency hell (C-compilers), abandoned maintenance, or bloated "black box" object hierarchies.
+## Highlights
 
-**v1indicators** solves this by adhering to four rules:
-1.  **Math > Magic:** Implementations are based on standard textbook formulas (Wilder, Lane, Bollinger).
-2.  **Simple > Fancy:** A pure functional API. Input arrays, output arrays. No complex classes.
-3.  **Hybrid JIT Engine:** Recursive indicators (Supertrend, PSAR) are **compiled to machine code** using **Numba (@jit)** for C-level speed, while vectorizable logic uses optimized NumPy.
-4.  **Reliability:** 100% test coverage with strict type validation and fault-tolerance (no silent crashes on empty data).
+- Vectorized implementations for performance-critical paths.
+- Numba-accelerated kernels for recursive/stateful indicators where appropriate.
+- Consistent indicator signatures across categories.
+- Broad indicator coverage across overlap, momentum, trend, volatility, volume, statistics, levels, and performance.
 
 ## Installation
 
-Requires Python 3.9+, NumPy, Pandas, and Numba.
+From source:
 
 ```bash
 pip install .
 ```
 
-## Quick Start
+For development:
 
-The API is standardized. All functions accept Pandas Series and return Pandas Series (for single-value indicators) or DataFrames (for multi-value indicators).
+```bash
+pip install -e ".[dev]"
+```
+
+## Quick Start
 
 ```python
 import pandas as pd
 from v1indicators import rsi, macd, supertrend
 
-# 1. Load your data (Engineering Standard: Lowercase columns)
-df = pd.read_csv("data.csv")  # Must have 'open', 'high', 'low', 'close', 'volume'
+df = pd.read_csv("data.csv")
 
-# 2. Simple Indicator (RSI)
-# Returns a Series named 'RSI_14'. Handles Zero-Loss (infinite gain) cases safely.
-df['RSI'] = rsi(df['close'], length=14)
+# Single-series output
+df["RSI_14"] = rsi(df["close"], length=14)
 
-# 3. Complex Indicator (MACD)
-# Returns a DataFrame with 'MACD', 'MACD_SIGNAL', 'MACD_HIST'
-macd_df = macd(df['close'], fast=12, slow=26, signal=9)
+# Multi-column output
+macd_df = macd(df["close"], fast=12, slow=26, signal=9)
 df = pd.concat([df, macd_df], axis=1)
 
-# 4. Pro Indicator (Supertrend)
-# Uses Numba JIT Kernel for high-speed recursive calculation
-# Returns 'SUPERTREND' and 'SUPERTREND_DIR'
-st_df = supertrend(df['high'], df['low'], df['close'], length=10, mult=3.0)
+st_df = supertrend(df["high"], df["low"], df["close"], length=10, mult=3.0)
 df = pd.concat([df, st_df], axis=1)
-
-print(df.tail())
 ```
 
-## Available Indicators
+## API Organization
 
-We currently support the "Essential 20"—the indicators used by 90% of professional systematic traders.
+The package is organized by indicator families:
+- overlap
+- momentum
+- trend
+- volatility
+- volume
+- statistics
+- levels
+- performance
 
-### Momentum
-* **RSI** (Relative Strength Index) - *Zero-Division Safe*
-* **MACD** (Moving Average Convergence Divergence)
-* **Stochastic** (Stochastic Oscillator)
-* **ROC** (Rate of Change)
-* **MFI** (Money Flow Index)
-* **CCI** (Commodity Channel Index)
+You can import from the package root for common indicators:
 
-### Overlap (Trend Filters)
-* **SMA** (Simple Moving Average)
-* **EMA** (Exponential Moving Average)
-* **WMA** (Weighted Moving Average)
-* **RMA** (Wilder's Smoothing / Running Moving Average)
-* **Bollinger Bands**
-* **Keltner Channels**
-* **Donchian Channels**
-* **Ichimoku Cloud**
+```python
+from v1indicators import ema, sma, rsi, atr, obv
+```
 
-### Trend (JIT Optimized)
-* **Supertrend** (Numba Accelerated)
-* **Parabolic SAR** (PSAR) (Numba Accelerated)
-* **ADX** (Average Directional Index)
+Or from family modules for explicit namespacing:
 
-### Volatility
-* **ATR** (Average True Range)
+```python
+from v1indicators.momentum import rsi, stoch
+from v1indicators.overlap import ema, bbands
+```
 
-### Volume
-* **OBV** (On-Balance Volume)
-* **VWAP** (Volume Weighted Average Price)
+## Data Requirements
 
-### Levels
-* **Fibonacci** Retracements
+Most indicators expect pandas Series aligned on the same index. Common field expectations:
+- close-only indicators: close
+- range-based indicators: high, low, close
+- volume indicators: close, volume (sometimes high/low/open as needed)
 
-## Development
+## Testing
 
-We enforce strict engineering standards.
+Run the full test suite:
 
 ```bash
-# Install dev dependencies
-pip install -e ".[dev]"
-
-# Run the test suite (100% Pass Rate Required)
 pytest
 ```
 

@@ -13,3 +13,6 @@ build/
 
 # OS junk
 .DS_Store
+
+# Local scratch and audit artifacts
+.tmp/

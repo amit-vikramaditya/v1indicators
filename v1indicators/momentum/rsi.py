@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 from .._utils import check_series
-from ..overlap.rma import rma
 
 def rsi(close: pd.Series, length: int = 14) -> pd.Series:
     """
@@ -27,30 +26,19 @@ def rsi(close: pd.Series, length: int = 14) -> pd.Series:
     close = check_series(close, "close")
     delta = close.diff()
 
-    # Note: We want to use NumPy for speed where possible, but preserving index is nice.
-    # But since rma takes series, we keep series.
-    
-    gain = delta.clip(lower=0)
-    loss = -delta.clip(upper=0)
+    positive = delta.copy()
+    negative = delta.copy()
+    positive[positive < 0] = 0.0
+    negative[negative > 0] = 0.0
 
-    # Use centralized RMA (Wilder's Smoothing)
-    avg_gain = rma(gain, length)
-    avg_loss = rma(loss, length)
+    # Wilder alpha with explicit warmup period.
+    alpha = 1.0 / float(length)
+    avg_gain = positive.ewm(alpha=alpha, min_periods=length, adjust=True).mean()
+    avg_loss = negative.ewm(alpha=alpha, min_periods=length, adjust=True).mean().abs()
 
-    # Calculate RS
-    # Handle division by zero safely
-    with np.errstate(divide='ignore', invalid='ignore'):
-        rs = avg_gain / avg_loss
-    
-    # RSI formula
-    rsi_series = 100 - (100 / (1 + rs))
-    
-    # Handle the cases:
-    # 1. avg_loss is 0, avg_gain > 0  => rs is inf => rsi is 100
-    # 2. avg_loss is 0, avg_gain is 0 => rs is nan => rsi is nan
-    
-    rsi_series = rsi_series.replace([np.inf], 100.0)
-    
+    with np.errstate(divide="ignore", invalid="ignore"):
+        rsi_series = 100.0 * avg_gain / (avg_gain + avg_loss)
+
     rsi_series.name = f"RSI_{length}"
     return rsi_series
 
