@@ -25,6 +25,7 @@ OVERLAP_SYMBOLS = (
     "smma",
     "multi_ma",
     "bbands",
+    "fibonacci_bbands",
     "donchian",
     "keltner",
     "ichimoku",
@@ -106,6 +107,7 @@ MOMENTUM_SYMBOLS = (
     "inertia",
     "qqe",
     "rsx",
+    "directional_logistic_oscillator",
 )
 
 VOLATILITY_SYMBOLS = (

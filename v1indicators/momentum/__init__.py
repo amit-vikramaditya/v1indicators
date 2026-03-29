@@ -49,6 +49,7 @@ from .ebsw import ebsw
 from .inertia import inertia
 from .qqe import qqe
 from .rsx import rsx
+from .directional_logistic_oscillator import directional_logistic_oscillator
 
 __all__ = [
     "rsi",
@@ -102,5 +103,6 @@ __all__ = [
     "inertia",
     "qqe",
     "rsx",
+    "directional_logistic_oscillator",
 ]
 

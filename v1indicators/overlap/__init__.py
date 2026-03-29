@@ -41,6 +41,7 @@ from .hwma import hwma
 from .aberration import aberration
 from .ma import ma
 from .ssf import ssf
+from .fibonacci_bbands import fibonacci_bbands
 
 __all__ = [
     "sma",
@@ -86,5 +87,6 @@ __all__ = [
     "aberration",
     "ma",
     "ssf",
+    "fibonacci_bbands",
 ]
 
