@@ -13,8 +13,11 @@ def validate_series(data: pd.Series, name: str = "data") -> np.ndarray:
     if data.empty:
         raise ValueError(f"{name} is empty")
     
-    # Ensure we are working with float64 for precision
-    values = data.to_numpy(dtype=np.float64)
+    # Prefer zero-copy where possible and make sure the output is contiguous
+    # for downstream NumPy/Numba kernels.
+    values = data.to_numpy(dtype=np.float64, copy=False)
+    if not values.flags.c_contiguous:
+        values = np.ascontiguousarray(values)
     return values
 
 def check_series(data: pd.Series, name: str = "data") -> pd.Series:
@@ -28,6 +31,9 @@ def check_series(data: pd.Series, name: str = "data") -> pd.Series:
     if data.empty:
         raise ValueError(f"{name} is empty")
     
+    if data.dtype == np.float64:
+        return data
+
     return data.astype(np.float64)
 
 def validate_df(df: pd.DataFrame, name: str = "dataframe") -> pd.DataFrame:

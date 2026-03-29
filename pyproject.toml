@@ -4,13 +4,28 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "v1indicators"
-version = "0.2.1"
+dynamic = ["version"]
 description = "Technical analysis indicators and scanners."
 readme = "README.md"
 requires-python = ">=3.9"
-license = {text = "MIT"}
+license = "MIT"
 authors = [
     {name = "Amit"}
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Office/Business :: Financial :: Investment",
+    "Topic :: Scientific/Engineering :: Information Analysis",
 ]
 
 dependencies = [
@@ -25,10 +40,18 @@ dev = [
     "pytest-cov>=4.0.0"
 ]
 
+[project.urls]
+Homepage = "https://github.com/amit-vikramaditya/v1indicators"
+Repository = "https://github.com/amit-vikramaditya/v1indicators"
+Issues = "https://github.com/amit-vikramaditya/v1indicators/issues"
+
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["v1indicators*"]
 exclude = ["v1backtest*", "tests*"]
+
+[tool.setuptools.dynamic]
+version = {attr = "v1indicators._version.__version__"}
 
 [tool.pytest.ini_options]
 minversion = "6.0"
