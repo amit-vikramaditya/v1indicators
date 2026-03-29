@@ -16,6 +16,8 @@ build/
 
 # Local scratch and audit artifacts
 .tmp/
+from tradingview/
+reports/
 
 # GitHub metadata
 .github/
