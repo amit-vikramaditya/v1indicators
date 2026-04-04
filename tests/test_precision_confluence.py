@@ -3,7 +3,7 @@ import pandas as pd
 import pytest
 from typing import Any, cast
 
-from v1indicators.trend.precision_confluence import precision_confluence
+from v1indicators.trend import precision_confluence
 
 
 def _ohlcv(n: int = 260) -> pd.DataFrame:

@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from v1indicators.momentum.rsi_bbands_signal import rsi_bbands_signal
+from v1indicators.momentum import rsi_bbands_signal
 
 
 def test_rsi_bbands_signal_basic_columns():

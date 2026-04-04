@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from v1indicators.momentum.ppo import ppo
+from v1indicators.momentum import ppo
 
 
 def test_ppo_basic():

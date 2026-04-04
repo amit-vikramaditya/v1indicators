@@ -1,5 +1,5 @@
 import pandas as pd
-from v1indicators.volatility.atr import atr
+from v1indicators.volatility import atr
 
 def test_atr_basic():
     """Test ATR with simple data."""

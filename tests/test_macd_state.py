@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from v1indicators.momentum.macd_state import macd_state
+from v1indicators.momentum import macd_state
 
 
 def test_macd_state_basic_sma_signal():

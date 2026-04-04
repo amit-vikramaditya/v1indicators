@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from v1indicators.momentum.rsi import rsi
+from v1indicators.momentum import rsi
 
 def test_rsi_basic():
     """Test RSI with a known sequence."""

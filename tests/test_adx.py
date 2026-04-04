@@ -1,5 +1,5 @@
 import pandas as pd
-from v1indicators.trend.adx import adx
+from v1indicators.trend import adx
 
 def test_adx_basic():
     """Test ADX with synthetic trend data."""

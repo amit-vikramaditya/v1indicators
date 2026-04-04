@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from v1indicators.volatility.williams_vix_fix import williams_vix_fix
+from v1indicators.volatility import williams_vix_fix
 
 
 def test_williams_vix_fix_basic():

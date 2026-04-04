@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from v1indicators.overlap.kalman_filter import kalman_filter
+from v1indicators.overlap import kalman_filter
 
 
 def _expected_kalman(source, high, low, close, velocity_alpha, range_alpha, memory_alpha):

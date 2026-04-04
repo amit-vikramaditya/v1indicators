@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from v1indicators.trend.htf_reversal_divergence import htf_reversal_divergence
+from v1indicators.trend import htf_reversal_divergence
 
 
 def _ohlc(n: int = 180) -> pd.DataFrame:

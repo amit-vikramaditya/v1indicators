@@ -3,7 +3,7 @@ import pandas as pd
 import pytest
 from typing import Any, cast
 
-from v1indicators.momentum.directional_logistic_oscillator import directional_logistic_oscillator
+from v1indicators.momentum import directional_logistic_oscillator
 
 
 def _sample_ohlc(size: int = 400) -> tuple[pd.Series, pd.Series, pd.Series]:

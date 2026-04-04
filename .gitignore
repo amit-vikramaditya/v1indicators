@@ -4,26 +4,32 @@ venv/
 
 # Python cache
 __pycache__/
-*.pyc
+*.py[cod]
+
+# Test and coverage artifacts
+.pytest_cache/
+.coverage
+htmlcov/
 
 # Packaging artifacts
 *.egg-info/
 dist/
 build/
+pip-wheel-metadata/
 
-# OS junk
-.DS_Store
-
-# Local scratch and audit artifacts
+# Local scratch and incubator inputs
 .tmp/
+.AIs/
 from tradingview/
 reports/
 
-# Ignore all dot-prefixed files/directories by default
-.*
-!.git/
-!.gitignore
-!.github/
-.github/*
-!.github/workflows/
-!.github/workflows/**
+# Editor / machine-local files
+.DS_Store
+.idea/
+.vscode/
+.python-version
+.env
+.env.*
+
+# GitHub metadata is intentionally not used in this repo
+.github/

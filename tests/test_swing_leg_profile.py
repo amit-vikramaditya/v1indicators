@@ -3,7 +3,7 @@ import pandas as pd
 import pytest
 from typing import Any, cast
 
-from v1indicators.volume.swing_leg_profile import swing_leg_profile
+from v1indicators.volume import swing_leg_profile
 
 
 def _ohlcv(n: int = 320) -> pd.DataFrame:

@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from v1indicators.overlap.tema import tema
+from v1indicators.overlap import tema
 
 
 def test_tema_basic():

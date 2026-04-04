@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from v1indicators.volume.delta_volume import delta_volume
+from v1indicators.volume import delta_volume
 
 
 def test_delta_volume_basic():

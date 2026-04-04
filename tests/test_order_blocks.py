@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from v1indicators.trend.order_blocks import order_blocks
+from v1indicators.trend import order_blocks
 
 
 def test_order_blocks_detects_bullish_and_bearish():

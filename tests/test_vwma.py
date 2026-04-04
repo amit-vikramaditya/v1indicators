@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from v1indicators.overlap.vwma import vwma
+from v1indicators.overlap import vwma
 
 
 def test_vwma_basic():

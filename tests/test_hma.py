@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from v1indicators.overlap.hma import hma
+from v1indicators.overlap import hma
 
 
 def _wma_expected(series: pd.Series, length: int) -> pd.Series:

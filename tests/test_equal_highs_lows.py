@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from v1indicators.levels.equal_highs_lows import equal_highs_lows
+from v1indicators.levels import equal_highs_lows
 
 
 def test_equal_highs_lows_basic():

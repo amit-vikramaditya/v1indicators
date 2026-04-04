@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from v1indicators.levels.pivot_points import pivot_points
+from v1indicators.levels import pivot_points
 
 
 def test_pivot_points_classic():

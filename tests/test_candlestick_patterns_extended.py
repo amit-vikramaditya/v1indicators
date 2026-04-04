@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from v1indicators.momentum.candlestick_patterns_extended import candlestick_patterns_extended
+from v1indicators.momentum import candlestick_patterns_extended
 
 
 def test_candlestick_patterns_extended_columns_and_doji():

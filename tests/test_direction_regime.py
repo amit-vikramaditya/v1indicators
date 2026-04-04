@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from v1indicators.trend.direction_regime import direction_regime
+from v1indicators.trend import direction_regime
 
 
 def test_direction_regime_basic():

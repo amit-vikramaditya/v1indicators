@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from v1indicators.volume.cmf import cmf
+from v1indicators.volume import cmf
 
 
 def test_cmf_basic():

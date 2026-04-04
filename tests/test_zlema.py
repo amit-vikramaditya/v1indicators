@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from v1indicators.overlap.zlema import zlema
+from v1indicators.overlap import zlema
 
 
 def test_zlema_basic():

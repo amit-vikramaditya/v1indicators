@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import pytest
-from v1indicators.momentum.macd import macd
+from v1indicators.momentum import macd
 
 def test_macd_basic():
     """Test MACD with simple data."""

@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from v1indicators.trend.support_resistance_channels import support_resistance_channels
+from v1indicators.trend import support_resistance_channels
 
 
 def test_support_resistance_channels_basic_shape():

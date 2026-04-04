@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from v1indicators.trend.session_range import session_range
+from v1indicators.trend import session_range
 
 
 def test_session_range_basic():

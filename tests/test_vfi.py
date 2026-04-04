@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from v1indicators.volume.vfi import vfi
+from v1indicators.volume import vfi
 
 
 def test_vfi_basic():

@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from v1indicators.levels.support_resistance import support_resistance
+from v1indicators.levels import support_resistance
 
 
 def test_support_resistance_basic_columns():

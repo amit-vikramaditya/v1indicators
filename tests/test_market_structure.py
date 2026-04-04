@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from v1indicators.trend.market_structure import market_structure
+from v1indicators.trend import market_structure
 
 
 def _expected_structure(close, resistance, support):

@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from v1indicators.volume.adl import adl
+from v1indicators.volume import adl
 
 
 def test_adl_basic():

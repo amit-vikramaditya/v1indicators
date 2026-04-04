@@ -1,5 +1,5 @@
 import pandas as pd
-from v1indicators.overlap.ema import ema
+from v1indicators.overlap import ema
 
 def test_ema_basic():
     """Test EMA with simple data."""

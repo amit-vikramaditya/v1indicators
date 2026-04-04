@@ -2,10 +2,10 @@ import pandas as pd
 import pytest
 from typing import Any, cast
 
-from v1indicators.overlap.fibonacci_bbands import fibonacci_bbands
-from v1indicators.overlap.hlc3 import hlc3
-from v1indicators.overlap.vwma import vwma
-from v1indicators.statistics.stdev import stdev
+from v1indicators.overlap import fibonacci_bbands
+from v1indicators.overlap import hlc3
+from v1indicators.overlap import vwma
+from v1indicators.statistics import stdev
 
 
 def test_fibonacci_bbands_basic_math():

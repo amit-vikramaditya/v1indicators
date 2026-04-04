@@ -1,5 +1,5 @@
 import pandas as pd
-from v1indicators.trend.psar import psar
+from v1indicators.trend import psar
 
 def test_psar_basic():
     """Test PSAR with a clear trend switch."""

@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from v1indicators.overlap.tma import tma
+from v1indicators.overlap import tma
 
 
 def test_tma_odd_length():

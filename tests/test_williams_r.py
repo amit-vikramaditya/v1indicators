@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from v1indicators.momentum.williams_r import williams_r
+from v1indicators.momentum import williams_r
 
 
 def test_williams_r_basic():

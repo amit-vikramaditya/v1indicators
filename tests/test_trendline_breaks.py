@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from v1indicators.trend.trendline_breaks import trendline_breaks
+from v1indicators.trend import trendline_breaks
 
 
 def _expected_breaks(close, pivot_high, pivot_low, length):

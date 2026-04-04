@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from v1indicators.trend.fair_value_gaps import fair_value_gaps
+from v1indicators.trend import fair_value_gaps
 
 
 def test_fair_value_gaps_detects_bullish_and_bearish():

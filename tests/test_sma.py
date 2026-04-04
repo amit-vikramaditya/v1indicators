@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 import pytest
-from v1indicators.overlap.sma import sma
+from v1indicators.overlap import sma
 
 def test_sma_basic():
     """Test SMA with a simple linear series."""

@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from v1indicators.overlap.multi_ma import multi_ma
+from v1indicators.overlap import multi_ma
 
 
 def test_multi_ma_basic_with_ema():

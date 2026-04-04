@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from v1indicators.trend.swing_trend_entry import swing_trend_entry
+from v1indicators.trend import swing_trend_entry
 
 
 def _expected_gap_source(close: pd.Series, gap_fraction: float) -> pd.Series:

@@ -2,9 +2,9 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from v1indicators.statistics.stdev import stdev
-from v1indicators.statistics.variance import variance
-from v1indicators.statistics.zscore import zscore
+from v1indicators.statistics import stdev
+from v1indicators.statistics import variance
+from v1indicators.statistics import zscore
 
 
 def test_stdev_variance_zscore_basic():

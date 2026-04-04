@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from v1indicators.momentum.squeeze_momentum import squeeze_momentum
+from v1indicators.momentum import squeeze_momentum
 
 
 def _linreg_last(window: np.ndarray) -> float:

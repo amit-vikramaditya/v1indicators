@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from v1indicators.overlap.kama import kama
+from v1indicators.overlap import kama
 
 
 def _kama_expected(close: pd.Series, length: int, fast: int, slow: int) -> pd.Series:

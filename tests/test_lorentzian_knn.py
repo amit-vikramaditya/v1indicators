@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from v1indicators.trend.lorentzian_knn import lorentzian_knn
+from v1indicators.trend import lorentzian_knn
 
 
 def test_lorentzian_knn_basic_shape():

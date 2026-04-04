@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from v1indicators.trend.high_volume_levels import high_volume_levels
+from v1indicators.trend import high_volume_levels
 
 
 def test_high_volume_levels_basic_columns():

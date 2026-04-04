@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from v1indicators.trend.range_filter_confluence import range_filter_confluence
+from v1indicators.trend import range_filter_confluence
 
 
 def _ohlc(n: int = 260) -> pd.DataFrame:

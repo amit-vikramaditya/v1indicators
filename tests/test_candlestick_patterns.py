@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from v1indicators.momentum.candlestick_patterns import candlestick_patterns
+from v1indicators.momentum import candlestick_patterns
 
 
 def test_candlestick_patterns_basic_shape():

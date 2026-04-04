@@ -74,6 +74,25 @@ from v1indicators.momentum import rsi, stoch
 from v1indicators.overlap import ema, bbands
 ```
 
+The package also exposes dependency-layer namespaces:
+- `v1indicators.foundational.*` for indicators built directly from price/volume/math inputs
+- `v1indicators.derived.*` for indicators built on top of one or more existing indicators
+
+Examples:
+
+```python
+from v1indicators.foundational.overlap import ema
+from v1indicators.derived.trend import ema_rsi_signal, supertrend
+```
+
+The original family imports remain the compatibility surface:
+
+```python
+from v1indicators.trend import ema_rsi_signal, supertrend
+```
+
+Repo-only incubator work belongs in `experimental/`. It is kept in GitHub but stays out of the published PyPI package until promoted.
+
 ## Data Requirements
 
 Most indicators expect pandas Series aligned on the same index. Common field expectations:

@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from v1indicators.trend.support_resistance_breaks import support_resistance_breaks
+from v1indicators.trend import support_resistance_breaks
 
 
 def test_support_resistance_breaks_detects_breaks():

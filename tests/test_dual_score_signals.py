@@ -3,7 +3,7 @@ import pandas as pd
 import pytest
 from typing import Any, cast
 
-from v1indicators.trend.dual_score_signals import dual_score_signals
+from v1indicators.trend import dual_score_signals
 
 
 def _ohlcv(n: int = 240) -> pd.DataFrame:

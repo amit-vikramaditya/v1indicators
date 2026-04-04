@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from v1indicators.volume.vpt import vpt
+from v1indicators.volume import vpt
 
 
 def test_vpt_basic():

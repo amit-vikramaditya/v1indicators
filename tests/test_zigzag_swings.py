@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from v1indicators.trend.zigzag_swings import zigzag_swings
+from v1indicators.trend import zigzag_swings
 
 
 def test_zigzag_swings_basic_shape():

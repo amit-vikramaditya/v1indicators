@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from v1indicators.momentum.wavetrend import wavetrend
+from v1indicators.momentum import wavetrend
 
 
 def test_wavetrend_basic():

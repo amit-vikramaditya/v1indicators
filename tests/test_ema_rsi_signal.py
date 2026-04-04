@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from v1indicators.trend.ema_rsi_signal import ema_rsi_signal
+from v1indicators.trend import ema_rsi_signal
 
 
 def test_ema_rsi_signal_basic():

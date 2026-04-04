@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from v1indicators.overlap.dema import dema
+from v1indicators.overlap import dema
 
 
 def test_dema_basic():

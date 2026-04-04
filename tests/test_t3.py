@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from v1indicators.overlap.t3 import t3
+from v1indicators.overlap import t3
 
 
 def test_t3_basic():

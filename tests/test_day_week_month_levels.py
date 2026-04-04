@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from v1indicators.trend.day_week_month_levels import day_week_month_levels
+from v1indicators.trend import day_week_month_levels
 
 
 def test_day_week_month_levels_basic():

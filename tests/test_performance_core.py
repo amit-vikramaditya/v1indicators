@@ -2,9 +2,9 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from v1indicators.performance.drawdown import drawdown
-from v1indicators.performance.log_return import log_return
-from v1indicators.performance.percent_return import percent_return
+from v1indicators.performance import drawdown
+from v1indicators.performance import log_return
+from v1indicators.performance import percent_return
 
 
 def test_log_and_percent_return_basic():

@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from v1indicators.trend.session_killzones import session_killzones
+from v1indicators.trend import session_killzones
 
 
 def test_session_killzones_basic_columns():

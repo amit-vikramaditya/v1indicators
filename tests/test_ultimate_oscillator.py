@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from v1indicators.momentum.ultimate_oscillator import ultimate_oscillator
+from v1indicators.momentum import ultimate_oscillator
 
 
 def test_ultimate_oscillator_basic():

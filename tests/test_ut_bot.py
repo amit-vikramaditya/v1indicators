@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from v1indicators.trend.ut_bot import ut_bot
+from v1indicators.trend import ut_bot
 
 
 def test_ut_bot_basic_shape_and_columns():

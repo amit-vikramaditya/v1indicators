@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from v1indicators.momentum.trix import trix
+from v1indicators.momentum import trix
 
 
 def test_trix_basic():

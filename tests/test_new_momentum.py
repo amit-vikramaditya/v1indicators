@@ -1,6 +1,6 @@
 import pandas as pd
-from v1indicators.momentum.mfi import mfi
-from v1indicators.momentum.cci import cci
+from v1indicators.momentum import mfi
+from v1indicators.momentum import cci
 
 def test_mfi_basic():
     high = pd.Series([10, 11, 12, 13, 14, 15])

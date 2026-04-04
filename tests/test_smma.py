@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from v1indicators.overlap.smma import smma
+from v1indicators.overlap import smma
 
 
 def test_smma_basic():

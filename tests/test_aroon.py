@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from v1indicators.trend.aroon import aroon, aroon_down, aroon_osc, aroon_up
+from v1indicators.trend import aroon, aroon_down, aroon_osc, aroon_up
 
 
 def _aroon_up_expected(high: pd.Series, length: int) -> pd.Series:

@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from v1indicators.momentum.three_line_strike import three_line_strike
+from v1indicators.momentum import three_line_strike
 
 
 def test_three_line_strike_detects_patterns():
