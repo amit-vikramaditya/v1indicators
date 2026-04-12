@@ -22,13 +22,9 @@ def _expected_breaks(close, pivot_high, pivot_low, length):
     for i in range(n):
         if not np.isnan(pivot_high[i]):
             cur_upper = pivot_high[i]
-        elif not np.isnan(cur_upper):
-            cur_upper = cur_upper
 
         if not np.isnan(pivot_low[i]):
             cur_lower = pivot_low[i]
-        elif not np.isnan(cur_lower):
-            cur_lower = cur_lower
 
         upper[i] = cur_upper
         lower[i] = cur_lower

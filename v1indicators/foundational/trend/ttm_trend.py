@@ -8,7 +8,7 @@ def ttm_trend(open_: pd.Series, high: pd.Series, low: pd.Series, close: pd.Serie
     if length <= 0:
         raise ValueError("length must be > 0")
 
-    _open_s = check_series(open_, "open")  # validated for OHLC API consistency/alignment; not used in this HLC-based approximation
+    check_series(open_, "open")  # validated for OHLC API consistency/alignment; not used in this HLC-based approximation
     high_s = check_series(high, "high")
     low_s = check_series(low, "low")
     close_s = check_series(close, "close")

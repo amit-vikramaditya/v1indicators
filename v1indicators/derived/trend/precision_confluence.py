@@ -26,6 +26,8 @@ _PRESETS = {
     "crypto-24-7": (9, 21, 55, 14, 20, 5, 2.0),
 }
 
+HTF_BIAS_WEIGHT = 1.5
+FAST_EMA_WEIGHT = 0.5
 
 def _resolve_profile(
     preset: str,
@@ -291,8 +293,8 @@ def precision_confluence(
         + (close_s > vwap_s).astype(np.float64)
         + (volume_s > vol_sma).astype(np.float64)
         + ((adx_df[adx_col] > 20.0) & (adx_df[dmp_col] > adx_df[dmn_col])).astype(np.float64)
-        + (htf_bias == 1).astype(np.float64) * 1.5  # Heavier weight: higher-timeframe trend alignment is treated as a stronger directional filter.
-        + (close_s > ema_fast_s).astype(np.float64) * 0.5  # Lighter weight: fast-EMA position is a short-term confirmation signal, not a primary driver.
+        + (htf_bias == 1).astype(np.float64) * HTF_BIAS_WEIGHT  # Heavier weight: higher-timeframe trend alignment is treated as a stronger directional filter.
+        + (close_s > ema_fast_s).astype(np.float64) * FAST_EMA_WEIGHT  # Lighter weight: fast-EMA position is a short-term confirmation signal, not a primary driver.
     )
 
     bear_score = (
@@ -304,8 +306,8 @@ def precision_confluence(
         + (close_s < vwap_s).astype(np.float64)
         + (volume_s > vol_sma).astype(np.float64)
         + ((adx_df[adx_col] > 20.0) & (adx_df[dmn_col] > adx_df[dmp_col])).astype(np.float64)
-        + (htf_bias == -1).astype(np.float64) * 1.5  # Mirror of bull_score: emphasize higher-timeframe bearish alignment.
-        + (close_s < ema_fast_s).astype(np.float64) * 0.5  # Mirror of bull_score: keep fast-EMA relation as secondary confirmation.
+        + (htf_bias == -1).astype(np.float64) * HTF_BIAS_WEIGHT  # Mirror of bull_score: emphasize higher-timeframe bearish alignment.
+        + (close_s < ema_fast_s).astype(np.float64) * FAST_EMA_WEIGHT  # Mirror of bull_score: keep fast-EMA relation as secondary confirmation.
     )
 
     ema_bull_cross = (ema_fast_s > ema_slow_s) & (ema_fast_s.shift(1) <= ema_slow_s.shift(1))
