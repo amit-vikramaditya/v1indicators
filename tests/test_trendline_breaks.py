@@ -56,24 +56,40 @@ def _expected_breaks(close, pivot_high, pivot_low, length):
     return upper, lower, slope_upper, slope_lower, break_up, break_down
 
 
-def test_trendline_breaks_basic():
+@pytest.mark.parametrize("slope_method", ["atr", "stdev", "linreg"])
+def test_trendline_breaks_basic(slope_method):
     high = pd.Series([10.0, 11.0, 12.0, 11.0, 10.5, 11.5, 12.5, 11.8, 11.0])
     low = pd.Series([9.0, 9.5, 10.0, 9.6, 9.3, 10.0, 10.8, 10.2, 9.8])
     close = pd.Series([9.4, 10.5, 11.8, 10.1, 9.7, 10.8, 12.2, 10.4, 9.9])
 
-    result = trendline_breaks(high, low, close, length=2, mult=0.0, slope_method="atr")
+    result = trendline_breaks(high, low, close, length=2, mult=0.0, slope_method=slope_method)
 
-    window = 5
-    pivot_high = high.where(high == high.rolling(window).max().shift(-2)).to_numpy(dtype=np.float64)
-    pivot_low = low.where(low == low.rolling(window).min().shift(-2)).to_numpy(dtype=np.float64)
-    expected = _expected_breaks(close.to_numpy(dtype=np.float64), pivot_high, pivot_low, length=2)
+    required_cols = {
+        "TRENDLINE_UPPER",
+        "TRENDLINE_LOWER",
+        "TRENDLINE_SLOPE_UPPER",
+        "TRENDLINE_SLOPE_LOWER",
+        "BREAKOUT_UP",
+        "BREAKOUT_DOWN",
+    }
+    assert required_cols.issubset(set(result.columns))
+    assert len(result) == len(close)
 
-    np.testing.assert_allclose(result["TRENDLINE_UPPER"], expected[0], equal_nan=True)
-    np.testing.assert_allclose(result["TRENDLINE_LOWER"], expected[1], equal_nan=True)
-    np.testing.assert_allclose(result["TRENDLINE_SLOPE_UPPER"], expected[2], equal_nan=True)
-    np.testing.assert_allclose(result["TRENDLINE_SLOPE_LOWER"], expected[3], equal_nan=True)
-    np.testing.assert_array_equal(result["BREAKOUT_UP"].to_numpy(), expected[4])
-    np.testing.assert_array_equal(result["BREAKOUT_DOWN"].to_numpy(), expected[5])
+    np.testing.assert_array_equal(result["BREAKOUT_UP"].to_numpy().dtype, np.dtype(bool))
+    np.testing.assert_array_equal(result["BREAKOUT_DOWN"].to_numpy().dtype, np.dtype(bool))
+
+    if slope_method == "atr":
+        window = 5
+        pivot_high = high.where(high == high.rolling(window).max().shift(-2)).to_numpy(dtype=np.float64)
+        pivot_low = low.where(low == low.rolling(window).min().shift(-2)).to_numpy(dtype=np.float64)
+        expected = _expected_breaks(close.to_numpy(dtype=np.float64), pivot_high, pivot_low, length=2)
+
+        np.testing.assert_allclose(result["TRENDLINE_UPPER"], expected[0], equal_nan=True)
+        np.testing.assert_allclose(result["TRENDLINE_LOWER"], expected[1], equal_nan=True)
+        np.testing.assert_allclose(result["TRENDLINE_SLOPE_UPPER"], expected[2], equal_nan=True)
+        np.testing.assert_allclose(result["TRENDLINE_SLOPE_LOWER"], expected[3], equal_nan=True)
+        np.testing.assert_array_equal(result["BREAKOUT_UP"].to_numpy(), expected[4])
+        np.testing.assert_array_equal(result["BREAKOUT_DOWN"].to_numpy(), expected[5])
 
 
 def test_trendline_breaks_input_validation():
