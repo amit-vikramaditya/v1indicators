@@ -13,6 +13,10 @@ from ...foundational.volume.vwap import vwap
 from ._step_resample import _expand_group_series, _resample_last
 
 
+# Minimum number of bars before signals are allowed; gives trend/momentum/volatility
+# indicators enough history to stabilize across presets/timeframes.
+_MIN_WARMUP_BARS = 50
+
 _PRESETS = {
     "scalping": (5, 13, 34, 8, 10, 4, 0.8),
     "aggressive": (8, 18, 50, 11, 12, 3, 1.2),
@@ -287,8 +291,8 @@ def precision_confluence(
         + (close_s > vwap_s).astype(np.float64)
         + (volume_s > vol_sma).astype(np.float64)
         + ((adx_df[adx_col] > 20.0) & (adx_df[dmp_col] > adx_df[dmn_col])).astype(np.float64)
-        + (htf_bias == 1).astype(np.float64) * 1.5
-        + (close_s > ema_fast_s).astype(np.float64) * 0.5
+        + (htf_bias == 1).astype(np.float64) * 1.5  # Heavier weight: higher-timeframe trend alignment is treated as a stronger directional filter.
+        + (close_s > ema_fast_s).astype(np.float64) * 0.5  # Lighter weight: fast-EMA position is a short-term confirmation signal, not a primary driver.
     )
 
     bear_score = (
@@ -300,8 +304,8 @@ def precision_confluence(
         + (close_s < vwap_s).astype(np.float64)
         + (volume_s > vol_sma).astype(np.float64)
         + ((adx_df[adx_col] > 20.0) & (adx_df[dmn_col] > adx_df[dmp_col])).astype(np.float64)
-        + (htf_bias == -1).astype(np.float64) * 1.5
-        + (close_s < ema_fast_s).astype(np.float64) * 0.5
+        + (htf_bias == -1).astype(np.float64) * 1.5  # Mirror of bull_score: emphasize higher-timeframe bearish alignment.
+        + (close_s < ema_fast_s).astype(np.float64) * 0.5  # Mirror of bull_score: keep fast-EMA relation as secondary confirmation.
     )
 
     ema_bull_cross = (ema_fast_s > ema_slow_s) & (ema_fast_s.shift(1) <= ema_slow_s.shift(1))
@@ -313,13 +317,16 @@ def precision_confluence(
     raw_buy = ema_bull_cross & bull_momentum & (rsi_s < 75.0) & (bull_score >= float(score_req))
     raw_sell = ema_bear_cross & bear_momentum & (rsi_s > 25.0) & (bear_score >= float(score_req))
 
-    warmup = max(et, 50)
+    raw_buy_np = raw_buy.to_numpy(dtype=bool, copy=False)
+    raw_sell_np = raw_sell.to_numpy(dtype=bool, copy=False)
+
+    warmup = max(et, _MIN_WARMUP_BARS)
     buy = np.zeros(len(close_s), dtype=bool)
     sell = np.zeros(len(close_s), dtype=bool)
     last_dir = 0
     for i in range(len(close_s)):
-        cb = bool(raw_buy.iloc[i]) and last_dir != 1 and i >= warmup
-        cs = bool(raw_sell.iloc[i]) and last_dir != -1 and i >= warmup
+        cb = raw_buy_np[i] and last_dir != 1 and i >= warmup
+        cs = raw_sell_np[i] and last_dir != -1 and i >= warmup
         if cb and cs:
             cs = False
         if cb:
