@@ -18,8 +18,8 @@ def _zigzag_swings_kernel(high_v: np.ndarray, low_v: np.ndarray, length: int):
     cur_trend = 0
     for i in range(length, n - length):
         h = high_v[i]
-        l = low_v[i]
-        if np.isnan(h) or np.isnan(l):
+        low_i = low_v[i]
+        if np.isnan(h) or np.isnan(low_i):
             trend[i] = cur_trend
             continue
 
@@ -30,7 +30,7 @@ def _zigzag_swings_kernel(high_v: np.ndarray, low_v: np.ndarray, length: int):
                 continue
             if high_v[j] > h:
                 local_max = False
-            if low_v[j] < l:
+            if low_v[j] < low_i:
                 local_min = False
             if not local_max and not local_min:
                 break
@@ -39,7 +39,7 @@ def _zigzag_swings_kernel(high_v: np.ndarray, low_v: np.ndarray, length: int):
             swing_high[i] = h
             cur_trend = -1
         elif local_min:
-            swing_low[i] = l
+            swing_low[i] = low_i
             cur_trend = 1
 
         trend[i] = cur_trend

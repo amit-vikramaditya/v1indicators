@@ -8,7 +8,7 @@ from v1indicators.overlap import kalman_filter
 def _expected_kalman(source, high, low, close, velocity_alpha, range_alpha, memory_alpha):
     src = source.to_numpy(dtype=np.float64)
     h = high.to_numpy(dtype=np.float64)
-    l = low.to_numpy(dtype=np.float64)
+    low_v = low.to_numpy(dtype=np.float64)
     c = close.to_numpy(dtype=np.float64)
 
     out = np.full(src.shape, np.nan, dtype=np.float64)
@@ -18,7 +18,7 @@ def _expected_kalman(source, high, low, close, velocity_alpha, range_alpha, memo
     value2 = 0.0
 
     for i in range(1, src.size):
-        tr = max(h[i] - l[i], abs(h[i] - c[i - 1]), abs(l[i] - c[i - 1]))
+        tr = max(h[i] - low_v[i], abs(h[i] - c[i - 1]), abs(low_v[i] - c[i - 1]))
         value1 = velocity_alpha * (src[i] - src[i - 1]) + memory_alpha * value1
         value2 = range_alpha * tr + memory_alpha * value2
         lam = abs(value1 / value2) if value2 != 0.0 else 0.0

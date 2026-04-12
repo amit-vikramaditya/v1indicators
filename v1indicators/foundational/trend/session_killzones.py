@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 
 from .._utils import check_series
@@ -42,8 +41,7 @@ def session_killzones(
 
     def _zone(prefix: str, session: tuple[str, str]):
         mask = _session_mask(idx, session[0], session[1])
-        zone_day = pd.Series(idx.date, index=idx)
-        zone_day = zone_day.where(mask)
+        zone_day = pd.Series(idx.date, index=idx).where(mask)
         z_high = high_s.where(mask).groupby(zone_day).cummax()
         z_low = low_s.where(mask).groupby(zone_day).cummin()
         z_range = z_high - z_low

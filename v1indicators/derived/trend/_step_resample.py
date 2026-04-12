@@ -47,9 +47,9 @@ def _resample_ohlc(
     groups = _step_groups(len(close_s), step_i)
     o = open_s.groupby(groups).first()
     h = high_s.groupby(groups).max()
-    l = low_s.groupby(groups).min()
+    low_resampled = low_s.groupby(groups).min()
     c = close_s.groupby(groups).last()
-    return o, h, l, c, groups
+    return o, h, low_resampled, c, groups
 
 
 def _group_end_mask(length: int, step: int) -> np.ndarray:
