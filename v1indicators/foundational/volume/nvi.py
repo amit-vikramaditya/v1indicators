@@ -17,5 +17,5 @@ def nvi(close: pd.Series, volume: pd.Series, length: int = 1, initial: float = 1
     trigger = (volume_s < volume_s.shift(1)).astype(float)
     contrib = trigger * roc
     out = (1.0 + contrib).cumprod() * initial
-    out.name = f"NVI_{length}"
+    out.name = "NVI"
     return out
