@@ -6,6 +6,7 @@ from .brar import brar
 from .candlestick_patterns import candlestick_patterns
 from .candlestick_patterns_extended import candlestick_patterns_extended
 from .cci import cci
+from .candle_direction import candle_direction
 from .cdl_doji import cdl_doji
 from .cdl_inside import cdl_inside
 from .cfo import cfo
@@ -73,6 +74,7 @@ __all__ = [
     "rvgi",
     "brar",
     "kdj",
+    "candle_direction",
     "cdl_doji",
     "cdl_inside",
     "ebsw",

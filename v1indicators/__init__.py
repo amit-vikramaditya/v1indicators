@@ -57,6 +57,7 @@ OVERLAP_SYMBOLS = (
 
 MOMENTUM_SYMBOLS = (
     "rsi",
+    "candle_direction",
     "macd",
     "stochastic",
     "roc",
@@ -111,6 +112,8 @@ MOMENTUM_SYMBOLS = (
 )
 
 VOLATILITY_SYMBOLS = (
+    "parkinson",
+    "garman_klass",
     "atr",
     "williams_vix_fix",
     "natr",
