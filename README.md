@@ -49,9 +49,13 @@ build if regressed):
   reference loops written directly from their textbook formulas
   (`test_parity_core.py`, `test_reference_math.py`), including the pinned
   warmup/seeding conventions.
-- **NaN warmup** — every indicator is NaN until it has enough history;
-  exponential-family outputs never emit bar-0 transient estimates
-  (`test_warmup_contract.py`).
+- **NaN warmup** — rolling-window and exponential-family outputs (`ema`,
+  `rma`, `smma`, `zlema`, `dema`, `tema`, `t3`, all ewm-smoothed
+  oscillators) are NaN until they have enough history; nested chains
+  compose their warmup (`test_warmup_contract.py`). Recursive
+  kernel-based adaptive MAs (`kama`, `vidya`, `mcgd`, `ssf`, `hwma`,
+  `kalman_filter`) and `psar` seed from the first bars as part of their
+  definitions — feed warmup history before the region you care about.
 - **Calendar/session correctness** on weekday-only market data shapes
   (`test_calendar_sessions.py`), and cross-indicator interoperability on
   nine scenarios (`test_interoperability_matrix.py`).

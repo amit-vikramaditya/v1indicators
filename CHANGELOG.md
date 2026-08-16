@@ -18,16 +18,19 @@ look-ahead exceptions**.
   and signals at the bar where the pivot is *confirmed* (pivot bar plus the
   confirmation window). Pass `causal=False` for the legacy retrospective
   placement (plotting only — never for backtests).
-- **NaN warmup everywhere (BREAKING).** The exponential family (`ema`, `rma`,
-  `smma`, `zlema`, `dema`, `tema`, `t3`) and every ewm-based oscillator now
+- **NaN warmup everywhere it is well-defined (BREAKING).** The exponential
+  family (`ema`, `rma`, `smma`, `zlema`, `dema`, `tema`, `t3`) and every
+  ewm-based oscillator now
   return NaN until they have `length` valid observations, instead of emitting
   bar-0 transient estimates; nested chains compose their warmup (TEMA is NaN
   for `3*(length-1)` bars, MACD signal for `slow+signal-2`). Previously the
   first values of every exponential output were seed-biased, silently
   corrupting early signals and making results depend on how much warmup
-  history was fed. Exceptions with no natural integer window (float-alpha
-  smoothers in `hwc`/`decay`) keep recursive-from-first-bar seeding,
-  documented in their docstrings.
+  history was fed. Remaining bar-0 emitters, deliberately and documented:
+  float-alpha smoothers with no natural window (`hwc`, `decay`) and the
+  recursive kernel MAs (`kama`, `vidya`, `mcgd`, `ssf`, `hwma`,
+  `kalman_filter`, `psar`), whose seeding is part of their algorithm
+  definitions.
 - **Unsorted indices now raise `ValueError`.** Every indicator assumes bar
   i+1 follows bar i; a non-monotonic index previously produced silent
   garbage.
