@@ -58,92 +58,70 @@ Every output preserves the input index and length.
 
 ## Correctness guarantees
 
-These properties are enforced by tests and CI (Python 3.10 / 3.12 / 3.14).
-A regression in any of them fails the build.
+Enforced by tests and CI (Python 3.10 / 3.12 / 3.14). A regression in any
+of them fails the build.
 
-| Property | Enforced by |
-|---|---|
-| No look-ahead bias | `tests/test_causality.py`, `tests/test_causality_params.py` |
-| Textbook formula parity | `tests/test_parity_core.py`, `tests/test_reference_math.py` |
-| NaN warmup boundaries | `tests/test_warmup_contract.py` |
-| Calendar/session correctness | `tests/test_calendar_sessions.py` |
-| Cross-indicator interoperability | `tests/test_interoperability_matrix.py` |
+| Guarantee | What it means | Enforced by |
+|---|---|---|
+| No look-ahead bias | Values on the first *K* bars never change when future bars are appended | `test_causality.py` · `test_causality_params.py` |
+| Textbook parity | ~30 core indicators match naive reference loops at 1e-9 | `test_parity_core.py` · `test_reference_math.py` |
+| NaN warmup | Outputs stay NaN until enough history exists | `test_warmup_contract.py` |
+| Calendar correctness | Day/week/month and session levels are right on gapped exchange calendars | `test_calendar_sessions.py` |
+| Interoperability | All outputs align on index and length across nine scenarios | `test_interoperability_matrix.py` |
 
 ### No look-ahead bias
 
-An indicator is causal when its values on the first *K* bars are identical
-whether it is computed on the full series or on a truncated *K*-bar prefix.
-If appending future bars changes a past value, the indicator repaints and
-any backtest built on it is wrong.
+An indicator that changes its past values when future bars arrive repaints,
+and any backtest built on it is wrong. The suite rules this out:
 
-- Every public function is checked this way on several synthetic datasets,
-  and again with parameters pushed away from their defaults.
-- Pivot-based indicators (`support_resistance`, `market_structure`,
-  `zigzag_swings`, ...) emit levels only after the pivot is confirmed —
-  a pivot needs `right` bars of future evidence by definition.
-- `ichimoku` follows the same rule: its Chikou column is emitted as
-  `close - close.shift(kijun)`, carrying the same information without
-  future data.
-- Indicators with a `causal` parameter accept `causal=False` for
-  retrospective textbook placement (plotting only). That mode repaints by
-  definition and emits a `UserWarning`.
+- Every public function is checked on several synthetic datasets.
+- The check repeats under non-default parameter values.
+- Pivot indicators activate levels only once the pivot is confirmed.
+- `ichimoku` emits Chikou as `close - close.shift(kijun)` — same information, no future bars.
+- `causal=False` (retrospective plotting mode) repaints by definition and raises a `UserWarning`.
 - `dpo` and `vp` were removed: no causal form of either exists.
 
-### Textbook formula parity
+### Textbook parity
 
-About thirty core indicators — the moving-average family, Bollinger Bands,
-Donchian, MACD, Stochastic, Williams %R, CMO, Ultimate Oscillator, Aroon,
-ADX, PSAR, ATR, Parkinson, Garman-Klass, Choppiness, OBV, AD, CMF, VWAP,
-and rolling statistics — are compared against plain-Python reference loops
-written from their textbook formulas, at 1e-9 tolerance.
+Covers the moving-average family, Bollinger Bands, Donchian, MACD,
+Stochastic, Williams %R, CMO, Ultimate, Aroon, ADX, PSAR, ATR, Parkinson,
+Garman-Klass, Choppiness, OBV, AD, CMF, VWAP and rolling statistics — each
+compared against a plain-Python loop written from its textbook formula.
 
 ### NaN warmup
 
-Rolling-window and exponential-family outputs (`ema`, `rma`, `smma`,
-`zlema`, `dema`, `tema`, `t3`, and the ewm-smoothed oscillators) are NaN
-until they have `length` valid observations. Nested chains add their
-stages: TEMA is NaN for `3*(length-1)` bars.
+Outputs are NaN until enough history exists for the value to mean something.
 
-Exception: the kernel-based adaptive averages (`kama`, `vidya`, `mcgd`,
-`ssf`, `hwma`, `kalman_filter`) and `psar` seed their recursion from the
-first bars, as their algorithms define. Feed warmup history before the
-region you care about.
+- `length` observations for a single window or ewm stage.
+- Nested chains add up: TEMA needs `3*(length-1)` bars, MACD signal `slow+signal-2`.
+- Kernel-based averages (`kama`, `vidya`, `mcgd`, `ssf`, `hwma`, `kalman_filter`) and `psar` seed from the first bars by algorithm definition — feed warmup history.
 
-### Calendar and session correctness
+## What is not verified
 
-Level and session tools are tested on weekday-only indices with weekend
-gaps and holidays — the shape real exchange data has.
+Six indicators compose the primitives above into trading signals. Their
+outputs are causal by construction — that is all this library claims about
+them. Nothing here measures whether their signals predict anything.
 
-### Interoperability
+| Signal engine | Output |
+|---|---|
+| `range_filter_confluence` | gated trend signals with a strength score |
+| `precision_confluence` | preset-aware confluence entries with SL/TP ladder |
+| `dual_score_signals` | dual-score entries with a five-step TP ladder |
+| `htf_reversal_divergence` | higher-timeframe reversal patterns with RSI divergence |
+| `swing_trend_entry` | moving-average touch entries |
+| `swing_leg_profile` | per-swing-leg volume profile |
 
-Every public symbol runs on nine synthetic scenarios (trend up/down,
-sideways, volatile, gapped, flat, low volume, NaN streaks, weekday gaps);
-outputs must align on index and length.
-
-## What is *not* verified
-
-`range_filter_confluence`, `precision_confluence`, `dual_score_signals`,
-`htf_reversal_divergence`, `swing_trend_entry` and `swing_leg_profile`
-compose the indicators above into buy/sell signals.
-
-Their outputs are causal by construction. That is all this library claims
-about them — nothing here measures whether their signals predict anything.
-Validate on your own data before trading them.
+Validate on your own data before trading any of them.
 
 ## Conventions
 
-- **Sorted input required** — an unsorted index raises `ValueError`; bar
-  *i+1* is always assumed to follow bar *i*.
-- **Boolean flags** are `False` where inputs are NaN or insufficient;
-  "no signal" and "not enough data" are not distinguished.
-- **Session/calendar tools** (`day_week_month_levels`, `session_range`,
-  `session_killzones`) read timestamps in the index's own clock — no
-  timezone conversion. Empty calendar periods are skipped, so "prior day"
-  means the prior *trading* day.
-- **`vwap`** accumulates from the first bar of the input; slice the input
-  to a session for a session VWAP.
-- **Aliases**: `kc` = `keltner`, `squeeze` = `squeeze_momentum`,
-  `uo` = `ultimate_oscillator`, `willr` = `williams_r`.
+| Situation | Behavior |
+|---|---|
+| Unsorted input index | `ValueError` — bar *i+1* must follow bar *i* |
+| Boolean flag columns | `False` when inputs are NaN or insufficient |
+| Session/calendar tools | Index-local clock, no timezone conversion; "prior day" = prior *trading* day |
+| `vwap` | Anchored to the first bar of the input — slice for a session VWAP |
+| Short names | `kc` = `keltner`, `squeeze` = `squeeze_momentum`, `uo` = `ultimate_oscillator`, `willr` = `williams_r` |
 
 ## API layout
 
