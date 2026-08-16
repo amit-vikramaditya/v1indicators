@@ -5,6 +5,7 @@ from numba import njit
 from .._utils import check_series
 from ...foundational.momentum.rsi import rsi
 from ._step_resample import _group_end_mask, _resample_ohlc
+from ..._causal import warn_if_non_causal
 
 
 @njit
@@ -83,6 +84,10 @@ def htf_reversal_divergence(
 ) -> pd.DataFrame:
     """HTF reversal-pattern flags with RSI pivot divergence confirmation.
 
+    Signal engine: outputs are causal by construction (no look-ahead), but their
+    predictive value is strategy- and market-dependent — this library verifies
+    measurement honesty, not trading performance.
+
     Higher-timeframe reversal patterns with RSI divergence confirmation,
     exposed as non-visual per-bar signal outputs.
 
@@ -99,6 +104,7 @@ def htf_reversal_divergence(
     if pivot_left <= 0 or pivot_right <= 0:
         raise ValueError("pivot_left and pivot_right must be > 0")
 
+    open_s = warn_if_non_causal("htf_reversal_divergence", causal)
     open_s = check_series(open_, "open")
     high_s = check_series(high, "high")
     low_s = check_series(low, "low")

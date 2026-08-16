@@ -1,6 +1,7 @@
 import pandas as pd
 
 from ..._utils import check_series
+from ..._causal import warn_if_non_causal
 
 
 def support_resistance(
@@ -27,6 +28,7 @@ def support_resistance(
     if left <= 0 or right <= 0:
         raise ValueError("left and right must be > 0")
 
+    high_s = warn_if_non_causal("support_resistance", causal)
     high_s = check_series(high, "high")
     low_s = check_series(low, "low")
     close_s = check_series(close, "close")

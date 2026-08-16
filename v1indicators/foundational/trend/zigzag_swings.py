@@ -3,6 +3,7 @@ import pandas as pd
 from numba import njit
 
 from .._utils import check_series
+from ..._causal import warn_if_non_causal
 
 
 @njit
@@ -73,6 +74,7 @@ def zigzag_swings(
     if length <= 0:
         raise ValueError("length must be > 0")
 
+    high_s = warn_if_non_causal("zigzag_swings", causal)
     high_s = check_series(high, "high")
     low_s = check_series(low, "low")
 

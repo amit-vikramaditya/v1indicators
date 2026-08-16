@@ -3,6 +3,7 @@ import pandas as pd
 from numba import njit
 
 from .._utils import check_series
+from ..._causal import warn_if_non_causal
 
 
 @njit
@@ -115,6 +116,7 @@ def support_resistance_channels(
     if loopback <= 0:
         raise ValueError("loopback must be > 0")
 
+    high_s = warn_if_non_causal("support_resistance_channels", causal)
     high_s = check_series(high, "high")
     low_s = check_series(low, "low")
     close_s = check_series(close, "close")

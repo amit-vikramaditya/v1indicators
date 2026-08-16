@@ -4,6 +4,7 @@ from numba import njit
 
 from .._utils import check_series
 from ...foundational.volatility.atr import atr
+from ..._causal import warn_if_non_causal
 
 
 @njit
@@ -120,6 +121,7 @@ def trendline_breaks(
     if method not in valid_methods:
         raise ValueError(f"slope_method must be one of {sorted(valid_methods)}")
 
+    high_s = warn_if_non_causal("trendline_breaks", causal)
     high_s = check_series(high, "high")
     low_s = check_series(low, "low")
     close_s = check_series(close, "close")

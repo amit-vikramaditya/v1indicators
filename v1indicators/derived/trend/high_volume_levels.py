@@ -2,6 +2,7 @@ import pandas as pd
 
 from .._utils import check_series
 from ...foundational.volume.delta_volume import delta_volume
+from ..._causal import warn_if_non_causal
 
 
 def high_volume_levels(
@@ -29,6 +30,7 @@ def high_volume_levels(
     if lookback <= 0 or vol_length <= 0:
         raise ValueError("lookback and vol_length must be > 0")
 
+    open_s = warn_if_non_causal("high_volume_levels", causal)
     open_s = check_series(open_, "open_")
     high_s = check_series(high, "high")
     low_s = check_series(low, "low")

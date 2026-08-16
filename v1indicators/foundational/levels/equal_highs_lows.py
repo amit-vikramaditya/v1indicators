@@ -1,6 +1,7 @@
 import pandas as pd
 
 from ..._utils import check_series
+from ..._causal import warn_if_non_causal
 
 
 def equal_highs_lows(
@@ -28,6 +29,7 @@ def equal_highs_lows(
     if threshold < 0:
         raise ValueError("threshold must be >= 0")
 
+    high_s = warn_if_non_causal("equal_highs_lows", causal)
     high_s = check_series(high, "high")
     low_s = check_series(low, "low")
 
