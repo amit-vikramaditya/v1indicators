@@ -5,7 +5,14 @@ from .._utils import check_series
 
 
 def vp(close: pd.Series, volume: pd.Series, width: int = 10, sort: bool = False) -> pd.DataFrame:
-    """Volume Profile snapshot by price bins."""
+    """Volume Profile snapshot by price bins.
+
+    SNAPSHOT semantics: the profile is computed over the ENTIRE series
+    passed in, so appending bars changes every bin. This is a whole-window
+    summary, not a per-bar indicator: feed it an explicit window when you
+    need reproducibility. A trailing-window variant may be added in a
+    future release.
+    """
     if width <= 0:
         raise ValueError("width must be > 0")
 
