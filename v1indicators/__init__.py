@@ -199,6 +199,8 @@ LEVELS_SYMBOLS = (
 
 STATISTICS_SYMBOLS = (
     "stdev",
+    "fractional_difference",
+    "hurst",
     "variance",
     "zscore",
     "median",
