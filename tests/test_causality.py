@@ -12,11 +12,7 @@ This is a whole-library quality gate: every public function reachable from
 the package root is auto-discovered, auto-invoked on synthetic OHLCV data
 by signature introspection, and checked for prefix-invariance.
 
-Known look-ahead by design (documented, intentionally not causal):
-    - ``ichimoku``: the Chikou span is today's close plotted kijun bars back
-      by definition.
-
-Every other function MUST pass. If a fix regresses causality, this file
+Every function MUST pass: no public function is permitted to repaint. If a fix regresses causality, this file
 fails; if a new indicator repaints, this file fails. Do not add entries to
 KNOWN_LOOKAHEAD without an explicit mathematical justification in the reason
 string and a decision recorded in the changelog.
@@ -43,12 +39,19 @@ _N_BARS = 800
 # the cut. A single prefix can miss it by luck; five cuts spanning 40%-87%
 # of the series make that practically impossible.
 _PREFIXES = (320, 400, 480, 560, 690)
-_SEED = 20260816
+# Multiple seeds: a repaint can also hide behind one lucky dataset. Each
+# seed generates a different trend/gap/noise realization.
+_SEEDS = (20260816, 7, 42)
+_SEED = _SEEDS[0]
+
+_DATA_CACHE: dict[int, dict[str, pd.Series]] = {}
 
 
-def _synthetic_ohlcv() -> dict[str, pd.Series]:
+def _synthetic_ohlcv(seed: int = _SEED) -> dict[str, pd.Series]:
     """Deterministic OHLCV with trends, gaps, flat stretches and NaN-free wicks."""
-    rng = np.random.default_rng(_SEED)
+    if seed in _DATA_CACHE:
+        return _DATA_CACHE[seed]
+    rng = np.random.default_rng(seed)
     index = pd.date_range(
         start=datetime(2026, 3, 2, 9, 15),  # a Monday
         periods=_N_BARS,
@@ -88,9 +91,11 @@ def _synthetic_ohlcv() -> dict[str, pd.Series]:
     fast = close.ewm(span=10, adjust=False).mean()
     slow = close.ewm(span=30, adjust=False).mean()
 
-    return {"open": open_, "open_": open_, "high": high, "low": low,
+    data = {"open": open_, "open_": open_, "high": high, "low": low,
             "close": close, "source": close, "volume": volume,
             "signal": close, "fast": fast, "slow": slow}
+    _DATA_CACHE[seed] = data
+    return data
 
 
 # ---------------------------------------------------------------------------
@@ -197,8 +202,8 @@ def _to_float(obj):
     return obj
 
 
-def _check_prefix_invariance(func) -> None:
-    full = _synthetic_ohlcv()
+def _check_prefix_invariance(func, seed: int = _SEED) -> None:
+    full = _synthetic_ohlcv(seed)
 
     out_full, skip_reason = _invoke(func, full)
     if skip_reason:
@@ -233,10 +238,10 @@ def _check_prefix_invariance(func) -> None:
 # Known look-ahead by design — the ONLY permitted failures
 # ---------------------------------------------------------------------------
 
-KNOWN_LOOKAHEAD = {
-    "ichimoku": "Chikou span is today's close plotted kijun bars back by "
-                "definition (textbook Ichimoku construction).",
-}
+# Empty as of 1.0.0: ichimoku's Chikou span became causal-by-default
+# (expressed as the close-vs-prior-close spread it encodes; the displaced
+# textbook form remains available via causal=False).
+KNOWN_LOOKAHEAD = {}
 
 # Whole-window SNAPSHOT functions: their output is a summary of the entire
 # input by definition (not a per-bar indicator), so prefix-invariance does
@@ -249,6 +254,7 @@ SNAPSHOT_FUNCTIONS = {}
 # Tests
 # ---------------------------------------------------------------------------
 
+@pytest.mark.parametrize("seed", _SEEDS)
 @pytest.mark.parametrize("name", [
     pytest.param(
         name,
@@ -260,10 +266,10 @@ SNAPSHOT_FUNCTIONS = {}
     ) if name in KNOWN_LOOKAHEAD else name
     for name in _public_symbols()
 ])
-def test_prefix_invariance(name):
+def test_prefix_invariance(name, seed):
     func = getattr(vi, name)
     assert callable(func)
-    _check_prefix_invariance(func)
+    _check_prefix_invariance(func, seed)
 
 
 def test_known_lookahead_registry_covers_only_real_entries():
