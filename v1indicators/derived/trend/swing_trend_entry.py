@@ -49,6 +49,10 @@ def swing_trend_entry(
     """
     Swing trend entry helper from adaptive MA regime logic.
 
+    Signal engine: outputs are causal by construction (no look-ahead), but their
+    predictive value is strategy- and market-dependent — this library verifies
+    measurement honesty, not trading performance.
+
     Builds a dynamic-gap source, computes short/long moving averages, and
     emits trend-direction and MA-touch alert flags.
     """

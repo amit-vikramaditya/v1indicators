@@ -170,6 +170,10 @@ def dual_score_signals(
 ) -> pd.DataFrame:
     """Dual-score EMA crossover system with ATR ladder targets.
 
+    Signal engine: outputs are causal by construction (no look-ahead), but their
+    predictive value is strategy- and market-dependent — this library verifies
+    measurement honesty, not trading performance.
+
     Dual-score (trend + momentum) signal engine.
     """
     if ema_fast <= 0 or ema_slow <= 0:

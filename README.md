@@ -37,15 +37,45 @@ over multiple synthetic seeds and sweeps non-default parameter values.
 - `dpo` and `vp` were removed in 1.0.0 (look-ahead by definition / snapshot
   semantics).
 
+## What is verified, and what is a hypothesis
+
+**Machine-verified for every public function** (these properties fail the
+build if regressed):
+
+- **No look-ahead / no repainting** — prefix-invariance across multiple
+  synthetic seeds AND non-default parameter values (`test_causality.py`,
+  `test_causality_params.py`).
+- **Textbook parity** — ~30 core indicators are pinned to naive plain-Python
+  reference loops written directly from their textbook formulas
+  (`test_parity_core.py`, `test_reference_math.py`), including the pinned
+  warmup/seeding conventions.
+- **NaN warmup** — every indicator is NaN until it has enough history;
+  exponential-family outputs never emit bar-0 transient estimates
+  (`test_warmup_contract.py`).
+- **Calendar/session correctness** on weekday-only market data shapes
+  (`test_calendar_sessions.py`), and cross-indicator interoperability on
+  nine scenarios (`test_interoperability_matrix.py`).
+
+**Signal engines are hypotheses, not facts.** `range_filter_confluence`,
+`precision_confluence`, `dual_score_signals`, `htf_reversal_divergence`,
+`swing_trend_entry` and `swing_leg_profile` compose verified primitives into
+trading signals. Their outputs are causal by construction, but this library
+verifies measurement honesty — not trading performance. Validate any
+strategy on your own data before risking capital.
+
 ## Conventions worth knowing
 
-- **Warmup**: exponential-family indicators (`ema`, `rma`, `smma`, `tema`,
-  `t3`, ...) emit values from bar 0 (pandas `ewm` convention) rather than
-  returning NaN until `length` bars have elapsed; rolling-window indicators
-  are NaN until their window fills. Early exponential values are a warmup
-  transient, not converged estimates.
+- **Warmup**: indicators return NaN until they have a meaningful amount of
+  history — `length` bars for a single window, with nested chains composing
+  (e.g. TEMA = 3 EMA stages is NaN for `3*(length-1)` bars). Feed warmup
+  history before the region you care about.
+- **Inputs must be time-sorted**: an unsorted index raises `ValueError`
+  (every indicator assumes bar i+1 follows bar i).
 - **Boolean outputs**: flag columns are `False` when inputs are NaN/insufficient
   — "no signal" and "not enough data" are not distinguished.
+- **Retrospective plotting modes**: pivot-family indicators accept
+  `causal=False` for textbook chart placement; it repaints by definition,
+  emits a `UserWarning` at runtime, and must never be used for backtests.
 - **Session/calendar tools** (`day_week_month_levels`, `session_range`,
   `session_killzones`) interpret timestamps in the index's own clock (no
   timezone conversion) and skip empty calendar periods: "prior day" means the

@@ -31,6 +31,10 @@ def range_filter_confluence(
 ) -> pd.DataFrame:
     """Adaptive range-filter confluence engine with anti-chop gating.
 
+    Signal engine: outputs are causal by construction (no look-ahead), but their
+    predictive value is strategy- and market-dependent — this library verifies
+    measurement honesty, not trading performance.
+
     Adaptive range-filter confluence engine with anti-chop gating.
     """
     if sensitivity <= 0:

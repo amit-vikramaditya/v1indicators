@@ -237,6 +237,10 @@ def precision_confluence(
 ) -> pd.DataFrame:
     """Preset-aware confluence trend signal engine with risk ladder outputs.
 
+    Signal engine: outputs are causal by construction (no look-ahead), but their
+    predictive value is strategy- and market-dependent — this library verifies
+    measurement honesty, not trading performance.
+
     Preset-aware confluence trend signal engine with risk ladder outputs.
     """
     if swing_lookback <= 0:

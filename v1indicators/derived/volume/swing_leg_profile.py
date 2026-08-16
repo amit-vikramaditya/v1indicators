@@ -18,6 +18,10 @@ def swing_leg_profile(
 ) -> pd.DataFrame:
     """Swing-leg volume profile summary metrics.
 
+    Signal engine: outputs are causal by construction (no look-ahead), but their
+    predictive value is strategy- and market-dependent — this library verifies
+    measurement honesty, not trading performance.
+
     Per-bar swing-leg volume profile.
     """
     if swing_length <= 1:

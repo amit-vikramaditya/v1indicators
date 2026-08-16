@@ -18,6 +18,22 @@ look-ahead exceptions**.
   and signals at the bar where the pivot is *confirmed* (pivot bar plus the
   confirmation window). Pass `causal=False` for the legacy retrospective
   placement (plotting only — never for backtests).
+- **NaN warmup everywhere (BREAKING).** The exponential family (`ema`, `rma`,
+  `smma`, `zlema`, `dema`, `tema`, `t3`) and every ewm-based oscillator now
+  return NaN until they have `length` valid observations, instead of emitting
+  bar-0 transient estimates; nested chains compose their warmup (TEMA is NaN
+  for `3*(length-1)` bars, MACD signal for `slow+signal-2`). Previously the
+  first values of every exponential output were seed-biased, silently
+  corrupting early signals and making results depend on how much warmup
+  history was fed. Exceptions with no natural integer window (float-alpha
+  smoothers in `hwc`/`decay`) keep recursive-from-first-bar seeding,
+  documented in their docstrings.
+- **Unsorted indices now raise `ValueError`.** Every indicator assumes bar
+  i+1 follows bar i; a non-monotonic index previously produced silent
+  garbage.
+- **`causal=False` emits a `UserWarning` at runtime** in every indicator
+  that exposes it: the retrospective mode repaints by definition and must
+  never reach a backtest silently.
 - **`ichimoku` is causal by default.** The Chikou column is emitted as the
   spread it encodes (`close - close.shift(kijun)`), which carries the identical
   signal information with no future data. `causal=False` restores the textbook
@@ -81,13 +97,18 @@ look-ahead exceptions**.
   `atr` without an explicit mode follow the new default (`supertrend`,
   `ut_bot`, ...); `range_filter` and `natr` deliberately pin `"ema"` to
   preserve their pre-1.0 outputs (documented in their docstrings).
-- Reference-math parity tests pin exact textbook behaviour for EMA, RMA and
-  CCI-with-MAD, and quantify the documented warmup-convention differences
-  for RSI and ATR-rma.
-- Documented conventions: warmup (exponential family emits from bar 0),
-  boolean flags are `False` on NaN inputs, `vwap` is anchored to the input's
-  first bar (no automatic session reset), `pivot_points` recomputes from the
-  prior *bar* (feed daily OHLC for classic daily pivots).
+- **Parity suite** (`tests/test_parity_core.py`): ~30 core indicators pinned
+  to naive plain-Python textbook reference loops at 1e-9 — SMA/WMA/HMA/TRIMA,
+  ZLEMA/DEMA/TEMA/T3, BBands/Donchian/VWMA, MOM/ROC/Stoch/%R/CMO/UO/MACD,
+  Aroon/ADX/PSAR, True Range/ATR/Parkinson/Garman-Klass/Choppiness,
+  OBV/AD/CMF/VWAP, stdev/zscore. Reference-math tests pin exact textbook
+  behaviour for EMA, RMA and CCI-with-MAD, and quantify the documented
+  warmup-convention differences for RSI.
+- Documented conventions: NaN warmup, boolean flags are `False` on NaN
+  inputs, `vwap` is anchored to the input's first bar (no automatic session
+  reset), `pivot_points` recomputes from the prior *bar* (feed daily OHLC
+  for classic daily pivots). Signal engines are explicitly labelled as
+  causal-but-unvalidated hypotheses in their docstrings and the README.
 - Requires Python >= 3.10 (the previous `>=3.9` claim was incorrect —
   PEP 604 annotations crash on 3.9 import).
 
@@ -97,10 +118,16 @@ look-ahead exceptions**.
   prefix-invariance checks across five cut points and multiple seeds.
 - `tests/test_causality_params.py` re-runs the causality property under
   non-default parameter values (window extremes, alternate modes, step sizes).
+- `tests/test_parity_core.py` pins ~30 core indicators against naive
+  textbook reference loops.
+- `tests/test_warmup_contract.py` pins the NaN-warmup convention for the
+  exponential family and the sorted-index contract.
+- `tests/test_causal_false_warning.py` forces every `causal`-parameter
+  indicator to warn on its retrospective mode (auto-discovered).
 - `tests/test_interoperability_matrix.py` exercises every symbol on eight
   market scenarios plus a weekday-only calendar scenario with weekend gaps.
 - `tests/test_calendar_sessions.py` pins the calendar/session behaviours
-  above on real-market data shapes (weekday-only indices).
+  on real-market data shapes (weekday-only indices).
 - GitHub Actions test workflow (`.github/workflows/tests.yml`) runs the full
   suite on Python 3.10 / 3.12 / 3.14.
 
