@@ -12,8 +12,15 @@ def atr(
     """
     Average True Range (ATR).
 
-    A market volatility indicator derived from the greatest of three values (True Range).
-    Uses Wilder's Smoothing (RMA).
+    A market volatility indicator derived from the greatest of three values
+    (True Range), smoothed by ``mamode``:
+    - ``"ema"`` (default): EMA with span=``length`` — the library default
+      since 0.1; NOT Wilder's original smoothing.
+    - ``"rma"``: Wilder's original recursive smoothing (alpha = 1/length).
+    - ``"sma"``: simple rolling mean.
+
+    The default is kept as ``"ema"`` for backward compatibility; pass
+    ``mamode="rma"`` for the textbook ATR (ta-lib / TradingView parity).
 
     Formula:
         TR = Max(High-Low, |High-PrevClose|, |Low-PrevClose|)
@@ -51,6 +58,9 @@ def atr(
     mode = mamode.lower() if mamode else "ema"
     if mode == "sma":
         result = tr.rolling(length, min_periods=min_periods).mean()
+    elif mode == "rma":
+        # Wilder's smoothing: alpha = 1/length, recursive (adjust=False).
+        result = tr.ewm(alpha=1.0 / length, min_periods=min_periods, adjust=False).mean()
     else:
         result = tr.ewm(span=length, min_periods=min_periods, adjust=True).mean()
 

@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-def wma(close: pd.Series, length: int) -> pd.Series:
+def wma(close: pd.Series, length: int = 20) -> pd.Series:
     """Weighted Moving Average."""
     if not isinstance(close, pd.Series):
         raise TypeError("close must be pandas Series")

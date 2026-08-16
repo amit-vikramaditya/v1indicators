@@ -1,7 +1,7 @@
 import pandas as pd
 from .._utils import check_series
 
-def ema(close: pd.Series, length: int, adjust: bool = False) -> pd.Series:
+def ema(close: pd.Series, length: int = 20, adjust: bool = False) -> pd.Series:
     """
     Exponential Moving Average (EMA).
 

@@ -87,8 +87,12 @@ def _synthetic_ohlcv() -> dict[str, pd.Series]:
         name="volume",
     )
 
+    fast = close.ewm(span=10, adjust=False).mean()
+    slow = close.ewm(span=30, adjust=False).mean()
+
     return {"open": open_, "open_": open_, "high": high, "low": low,
-            "close": close, "source": close, "volume": volume}
+            "close": close, "source": close, "volume": volume,
+            "signal": close, "fast": fast, "slow": slow}
 
 
 # ---------------------------------------------------------------------------
@@ -103,6 +107,9 @@ _SERIES_PARAM_ALIASES = {
     "close": "close",
     "volume": "volume",
     "source": "source",  # kalman_filter: any price series works
+    "signal": "signal",  # decay(): generic trigger series
+    "fast": "fast",      # long_run/short_run: fast MA series
+    "slow": "slow",      # long_run/short_run: slow MA series
 }
 
 
@@ -115,13 +122,25 @@ def _invoke(func, data: dict[str, pd.Series]):
 
     Returns (result, None) on success or (None, reason) when a required
     parameter cannot be satisfied from OHLCV series (auto-skip case).
+
+    ``fast``/``slow``/``signal`` are ambiguous: MA-pair/trigger functions
+    (long_run/short_run/decay) take them as SERIES, while oscillator
+    functions (ao, macd, kdj, ...) take them as integer lengths. Disambiguated
+    by context: if the signature already receives any price/volume series,
+    they are scalars.
     """
     sig = inspect.signature(func)
+    has_price_series = any(
+        p in ("open", "open_", "high", "low", "close", "source", "volume")
+        for p in sig.parameters
+    )
     kwargs = {}
     for name, param in sig.parameters.items():
         if param.kind in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD):
             continue
         if name in _SERIES_PARAM_ALIASES:
+            if name in ("fast", "slow", "signal") and has_price_series:
+                continue  # integer length in this signature; keep its default
             kwargs[name] = data[_SERIES_PARAM_ALIASES[name]]
         elif param.default is inspect.Parameter.empty:
             # A required parameter we cannot supply (e.g. a second index,

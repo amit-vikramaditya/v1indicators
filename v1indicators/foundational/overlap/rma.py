@@ -1,7 +1,7 @@
 import pandas as pd
 from .._utils import check_series
 
-def rma(close: pd.Series, length: int) -> pd.Series:
+def rma(close: pd.Series, length: int = 20) -> pd.Series:
     """
     Wilder's Smoothing (Running Moving Average).
     Equivalent to EMA with alpha = 1 / length.

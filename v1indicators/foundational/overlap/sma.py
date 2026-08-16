@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from .._utils import validate_series, to_series
 
-def sma(close: pd.Series, length: int) -> pd.Series:
+def sma(close: pd.Series, length: int = 20) -> pd.Series:
     """
     Simple Moving Average (SMA).
 
