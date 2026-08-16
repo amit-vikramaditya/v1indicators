@@ -8,13 +8,21 @@ def equal_highs_lows(
     low: pd.Series,
     length: int = 3,
     threshold: float = 0.1,
+    causal: bool = True,
 ) -> pd.DataFrame:
     """
     Equal highs/lows detector.
 
     A level is considered equal when two consecutive local pivots are within
     `threshold` percent of each other.
+
+    When ``causal=True`` (default), pivots and every derived level/signal are
+    delayed to the bar where the pivot is actually confirmed (pivot bar plus
+    ``length`` bars), so each output value was knowable in real time.
+    ``causal=False`` restores the legacy retrospective placement, suitable
+    only for plotting historical structure and not for backtests.
     """
+
     if length <= 0:
         raise ValueError("length must be > 0")
     if threshold < 0:
@@ -26,6 +34,10 @@ def equal_highs_lows(
     window = 2 * length + 1
     pivot_high = high_s.where(high_s == high_s.rolling(window).max().shift(-length))
     pivot_low = low_s.where(low_s == low_s.rolling(window).min().shift(-length))
+
+    if causal:
+        pivot_high = pivot_high.shift(length)
+        pivot_low = pivot_low.shift(length)
 
     last_ph = pivot_high.ffill()
     prev_ph = last_ph.shift(1)

@@ -79,10 +79,17 @@ def htf_reversal_divergence(
     rsi_length: int = 14,
     pivot_left: int = 5,
     pivot_right: int = 5,
+    causal: bool = True,
 ) -> pd.DataFrame:
     """HTF reversal-pattern flags with RSI pivot divergence confirmation.
 
     Inspired by TradingView file 6, focused on non-visual signal outputs.
+
+    When `causal=True` (default), RSI pivots and divergence flags are delayed
+    to the bar where the pivot is actually confirmed (pivot bar plus
+    `pivot_right` bars), so each output value was knowable in real time. HTF
+    candle patterns are already causal (emitted only at group close).
+    `causal=False` restores the legacy retrospective pivot placement.
     """
     if htf_step <= 0:
         raise ValueError("htf_step must be > 0")
@@ -114,15 +121,22 @@ def htf_reversal_divergence(
     end_mask = _group_end_mask(len(close_s), htf_step)
     end_idx = np.where(end_mask)[0]
 
+    # The reduced HTF series may include a trailing PARTIAL group whose OHLC
+    # is not final; only complete groups' patterns are emitted, at their
+    # closing bar. Group g of the reduced series aligns with end position
+    # (g + 1) * htf_step - 1, so slicing to the number of complete groups
+    # aligns the two and drops the partial group.
+    n_complete = len(end_idx)
+
     bull_arr = np.zeros(len(close_s), dtype=np.bool_)
     bear_arr = np.zeros(len(close_s), dtype=np.bool_)
     hammer_arr = np.zeros(len(close_s), dtype=np.bool_)
     star_arr = np.zeros(len(close_s), dtype=np.bool_)
 
-    bull_arr[end_idx] = bull_engulfing.fillna(False).to_numpy(dtype=np.bool_)
-    bear_arr[end_idx] = bear_engulfing.fillna(False).to_numpy(dtype=np.bool_)
-    hammer_arr[end_idx] = hammer.fillna(False).to_numpy(dtype=np.bool_)
-    star_arr[end_idx] = shooting_star.fillna(False).to_numpy(dtype=np.bool_)
+    bull_arr[end_idx] = bull_engulfing.fillna(False).to_numpy(dtype=np.bool_)[:n_complete]
+    bear_arr[end_idx] = bear_engulfing.fillna(False).to_numpy(dtype=np.bool_)[:n_complete]
+    hammer_arr[end_idx] = hammer.fillna(False).to_numpy(dtype=np.bool_)[:n_complete]
+    star_arr[end_idx] = shooting_star.fillna(False).to_numpy(dtype=np.bool_)[:n_complete]
 
     bull_engulfing_full = pd.Series(bull_arr, index=close_s.index)
     bear_engulfing_full = pd.Series(bear_arr, index=close_s.index)
@@ -137,6 +151,16 @@ def htf_reversal_divergence(
         int(pivot_left),
         int(pivot_right),
     )
+
+    if causal:
+        # A pivot at bar t is only knowable at t + pivot_right; activate then.
+        def _delay(arr: np.ndarray) -> np.ndarray:
+            delayed = pd.Series(arr, index=close_s.index).shift(pivot_right, fill_value=False)
+            return delayed.to_numpy(dtype=np.bool_)
+        pivot_low = _delay(pivot_low)
+        pivot_high = _delay(pivot_high)
+        bull_div = _delay(bull_div)
+        bear_div = _delay(bear_div)
 
     return pd.DataFrame(
         {

@@ -93,6 +93,7 @@ def trendline_breaks(
     length: int = 14,
     mult: float = 1.0,
     slope_method: str = "atr",
+    causal: bool = True,
 ) -> pd.DataFrame:
     """
     Pivot-based trendlines with breakout flags.
@@ -100,9 +101,15 @@ def trendline_breaks(
     Creates descending resistance and ascending support trendlines from pivots,
     then flags close breakouts through those lines.
 
-    This is a retrospective structure indicator: pivot anchors are only
-    confirmed after `length` future bars.
+    Descending resistance / ascending support trendlines from pivot anchors.
+
+    When ``causal=True`` (default), pivots and every derived level/signal are
+    delayed to the bar where the pivot is actually confirmed (pivot bar plus
+    ``length`` bars), so each output value was knowable in real time.
+    ``causal=False`` restores the legacy retrospective placement, suitable
+    only for plotting historical structure and not for backtests.
     """
+
     if length <= 1:
         raise ValueError("length must be > 1")
     if mult < 0:
@@ -135,6 +142,10 @@ def trendline_breaks(
     window = 2 * length + 1
     pivot_high = high_s.where(high_s == high_s.rolling(window).max().shift(-length))
     pivot_low = low_s.where(low_s == low_s.rolling(window).min().shift(-length))
+
+    if causal:
+        pivot_high = pivot_high.shift(length)
+        pivot_low = pivot_low.shift(length)
 
     upper, lower, slope_upper, slope_lower, breakout_up, breakout_down = _trendline_breaks_kernel(
         close_s.to_numpy(dtype=np.float64),

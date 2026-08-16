@@ -57,8 +57,9 @@ def _group_end_mask(length: int, step: int) -> np.ndarray:
     mask = np.zeros(length, dtype=bool)
     if length == 0:
         return mask
+    # Only COMPLETE groups are marked: a trailing partial group emits nothing
+    # until it closes. Force-marking the final bar would make outputs depend
+    # on where the series ends (look-ahead at the boundary).
     end_idx = np.arange(step_i - 1, length, step_i, dtype=np.int64)
-    if end_idx.size == 0 or end_idx[-1] != length - 1:
-        end_idx = np.append(end_idx, length - 1)
     mask[end_idx] = True
     return mask

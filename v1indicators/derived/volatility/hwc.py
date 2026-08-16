@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 from ..._utils import check_series
@@ -24,6 +25,6 @@ def hwc(
     upper = mid + scalar * std
     lower = mid - scalar * std
     width = upper - lower
-    pct = (close_s - lower) / width.replace(0.0, pd.NA)
+    pct = (close_s - lower) / width.replace(0.0, np.nan)
 
     return pd.DataFrame({"HWM_1": mid, "HWL_1": lower, "HWU_1": upper, "HWW_1": width, "HWPCT_1": pct})

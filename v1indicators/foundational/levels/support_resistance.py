@@ -9,13 +9,21 @@ def support_resistance(
     close: pd.Series,
     left: int = 15,
     right: int = 15,
+    causal: bool = True,
 ) -> pd.DataFrame:
     """
     Pivot-based support/resistance levels with breakout flags.
 
     A pivot high at bar t is the maximum over [t-left, t+right],
     and similarly for pivot lows.
+
+    When ``causal=True`` (default), pivots and every derived level/signal are
+    delayed to the bar where the pivot is actually confirmed (pivot bar plus
+    ``right`` bars), so each output value was knowable in real time.
+    ``causal=False`` restores the legacy retrospective placement, suitable
+    only for plotting historical structure and not for backtests.
     """
+
     if left <= 0 or right <= 0:
         raise ValueError("left and right must be > 0")
 
@@ -30,6 +38,10 @@ def support_resistance(
 
     pivot_high = high_s.where(high_s == roll_max)
     pivot_low = low_s.where(low_s == roll_min)
+
+    if causal:
+        pivot_high = pivot_high.shift(right)
+        pivot_low = pivot_low.shift(right)
 
     resistance = pivot_high.ffill()
     support = pivot_low.ffill()

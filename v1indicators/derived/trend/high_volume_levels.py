@@ -12,14 +12,20 @@ def high_volume_levels(
     volume: pd.Series,
     lookback: int = 20,
     vol_length: int = 2,
+    causal: bool = True,
 ) -> pd.DataFrame:
     """
     Support/resistance levels confirmed by extreme directional volume.
 
     Uses delta volume with rolling high/low thresholds and pivot detection.
-    The pivots are confirmed with a symmetric window, so the resulting levels
-    are retrospective rather than strictly causal.
+
+    When ``causal=True`` (default), pivots and every derived level/signal are
+    delayed to the bar where the pivot is actually confirmed (pivot bar plus
+    ``lookback`` bars), so each output value was knowable in real time.
+    ``causal=False`` restores the legacy retrospective placement, suitable
+    only for plotting historical structure and not for backtests.
     """
+
     if lookback <= 0 or vol_length <= 0:
         raise ValueError("lookback and vol_length must be > 0")
 
@@ -36,8 +42,15 @@ def high_volume_levels(
     ph = high_s.where(high_s == high_s.rolling(2 * lookback + 1).max().shift(-lookback))
     pl = low_s.where(low_s == low_s.rolling(2 * lookback + 1).min().shift(-lookback))
 
-    resistance = ph.where(dvol < vol_lo).ffill()
-    support = pl.where(dvol > vol_hi).ffill()
+    ph = ph.where(dvol < vol_lo)
+    pl = pl.where(dvol > vol_hi)
+
+    if causal:
+        ph = ph.shift(lookback)
+        pl = pl.shift(lookback)
+
+    resistance = ph.ffill()
+    support = pl.ffill()
 
     break_resistance = (close_s.shift(1) <= resistance.shift(1)) & (close_s > resistance.shift(1))
     break_support = (close_s.shift(1) >= support.shift(1)) & (close_s < support.shift(1))

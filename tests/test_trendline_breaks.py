@@ -64,8 +64,15 @@ def test_trendline_breaks_basic():
     result = trendline_breaks(high, low, close, length=2, mult=0.0, slope_method="atr")
 
     window = 5
-    pivot_high = high.where(high == high.rolling(window).max().shift(-2)).to_numpy(dtype=np.float64)
-    pivot_low = low.where(low == low.rolling(window).min().shift(-2)).to_numpy(dtype=np.float64)
+    # Causal default: pivots activate `length` bars after the pivot bar.
+    pivot_high = (
+        high.where(high == high.rolling(window).max().shift(-2)).shift(2)
+        .to_numpy(dtype=np.float64)
+    )
+    pivot_low = (
+        low.where(low == low.rolling(window).min().shift(-2)).shift(2)
+        .to_numpy(dtype=np.float64)
+    )
     expected = _expected_breaks(close.to_numpy(dtype=np.float64), pivot_high, pivot_low, length=2)
 
     np.testing.assert_allclose(result["TRENDLINE_UPPER"], expected[0], equal_nan=True)
@@ -87,3 +94,25 @@ def test_trendline_breaks_input_validation():
 
     with pytest.raises(TypeError):
         trendline_breaks([1.0, 2.0], s, s)
+
+
+def test_trendline_breaks_retrospective_mode():
+    """causal=False restores the legacy pivot-at-own-bar placement."""
+    high = pd.Series([10.0, 11.0, 12.0, 11.0, 10.5, 11.5, 12.5, 11.8, 11.0])
+    low = pd.Series([9.0, 9.5, 10.0, 9.6, 9.3, 10.0, 10.8, 10.2, 9.8])
+    close = pd.Series([9.4, 10.5, 11.8, 10.1, 9.7, 10.8, 12.2, 10.4, 9.9])
+
+    result = trendline_breaks(high, low, close, length=2, mult=0.0,
+                              slope_method="atr", causal=False)
+
+    window = 5
+    pivot_high = high.where(high == high.rolling(window).max().shift(-2)).to_numpy(dtype=np.float64)
+    pivot_low = low.where(low == low.rolling(window).min().shift(-2)).to_numpy(dtype=np.float64)
+    expected = _expected_breaks(close.to_numpy(dtype=np.float64), pivot_high, pivot_low, length=2)
+
+    np.testing.assert_allclose(result["TRENDLINE_UPPER"], expected[0], equal_nan=True)
+    np.testing.assert_allclose(result["TRENDLINE_LOWER"], expected[1], equal_nan=True)
+    np.testing.assert_allclose(result["TRENDLINE_SLOPE_UPPER"], expected[2], equal_nan=True)
+    np.testing.assert_allclose(result["TRENDLINE_SLOPE_LOWER"], expected[3], equal_nan=True)
+    np.testing.assert_array_equal(result["BREAKOUT_UP"].to_numpy(), expected[4])
+    np.testing.assert_array_equal(result["BREAKOUT_DOWN"].to_numpy(), expected[5])

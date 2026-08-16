@@ -20,7 +20,7 @@ def _lorentzian_knn_kernel(
     signal = np.zeros(n, dtype=np.int8)
 
     for i in range(n):
-        if i < horizon or i >= n - horizon:
+        if i < horizon:
             continue
 
         start = i - max_bars_back

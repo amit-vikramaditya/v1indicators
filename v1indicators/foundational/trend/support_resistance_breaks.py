@@ -15,6 +15,7 @@ def support_resistance_breaks(
     volume_fast: int = 5,
     volume_slow: int = 10,
     volume_threshold: float = 20.0,
+    causal: bool = True,
 ) -> pd.DataFrame:
     """
     Pivot support/resistance with breakout classification and volume filter.
@@ -22,9 +23,16 @@ def support_resistance_breaks(
     Breakouts are filtered by volume oscillator and split into body-dominant
     and wick-dominant breaks.
 
-    This is a retrospective pivot-based indicator: the pivot anchors are
-    confirmed with `right` future bars.
+    Breakouts are filtered by volume oscillator and split into body-dominant
+    and wick-dominant breaks, from pivots confirmed with a symmetric window.
+
+    When ``causal=True`` (default), pivots and every derived level/signal are
+    delayed to the bar where the pivot is actually confirmed (pivot bar plus
+    ``right`` bars), so each output value was knowable in real time.
+    ``causal=False`` restores the legacy retrospective placement, suitable
+    only for plotting historical structure and not for backtests.
     """
+
     if left <= 0 or right <= 0:
         raise ValueError("left and right must be > 0")
     if volume_fast <= 0 or volume_slow <= 0:
@@ -39,6 +47,10 @@ def support_resistance_breaks(
     window = left + right + 1
     pivot_high = high_s.where(high_s == high_s.rolling(window).max().shift(-right))
     pivot_low = low_s.where(low_s == low_s.rolling(window).min().shift(-right))
+
+    if causal:
+        pivot_high = pivot_high.shift(right)
+        pivot_low = pivot_low.shift(right)
 
     resistance = pivot_high.ffill()
     support = pivot_low.ffill()

@@ -89,6 +89,7 @@ def support_resistance_channels(
     channel_width_pct: float = 5.0,
     min_strength: int = 2,
     loopback: int = 290,
+    causal: bool = True,
 ) -> pd.DataFrame:
     """
     Support/Resistance channels from pivot clustering.
@@ -96,9 +97,15 @@ def support_resistance_channels(
     Inspired by TradingView support-resistance channel logic, adapted for
     calculation-only API: strongest resistance above and support below price.
 
-    This is a retrospective pivot-based indicator: pivot anchors are only
-    confirmed after `pivot_period` future bars.
+    Pivot clustering over recent anchors for the strongest levels.
+
+    When ``causal=True`` (default), pivots and every derived level/signal are
+    delayed to the bar where the pivot is actually confirmed (pivot bar plus
+    ``pivot_period`` bars), so each output value was knowable in real time.
+    ``causal=False`` restores the legacy retrospective placement, suitable
+    only for plotting historical structure and not for backtests.
     """
+
     if pivot_period <= 0:
         raise ValueError("pivot_period must be > 0")
     if channel_width_pct <= 0:
@@ -118,6 +125,9 @@ def support_resistance_channels(
 
     pivot_values = pivot_high.copy()
     pivot_values = pivot_values.where(pivot_values.notna(), pivot_low)
+
+    if causal:
+        pivot_values = pivot_values.shift(pivot_period)
 
     range300 = (high_s.rolling(300).max() - low_s.rolling(300).min())
     width = range300 * (channel_width_pct / 100.0)

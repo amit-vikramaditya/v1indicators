@@ -56,14 +56,20 @@ def zigzag_swings(
     high: pd.Series,
     low: pd.Series,
     length: int = 9,
+    causal: bool = True,
 ) -> pd.DataFrame:
     """
     ZigZag swing points and directional state.
 
     Uses local extrema over a symmetric lookback/lookforward window.
-    Swing labels are therefore retrospective and only confirmed after `length`
-    future bars.
+
+    When ``causal=True`` (default), pivots and every derived level/signal are
+    delayed to the bar where the pivot is actually confirmed (pivot bar plus
+    ``length`` bars), so each output value was knowable in real time.
+    ``causal=False`` restores the legacy retrospective placement, suitable
+    only for plotting historical structure and not for backtests.
     """
+
     if length <= 0:
         raise ValueError("length must be > 0")
 
@@ -75,6 +81,15 @@ def zigzag_swings(
         low_s.to_numpy(dtype=np.float64),
         int(length),
     )
+
+    swing_high = pd.Series(swing_high, index=high_s.index)
+    swing_low = pd.Series(swing_low, index=high_s.index)
+    trend = pd.Series(trend, index=high_s.index)
+
+    if causal:
+        swing_high = swing_high.shift(length)
+        swing_low = swing_low.shift(length)
+        trend = trend.shift(length).fillna(0).astype(np.int8)
 
     return pd.DataFrame(
         {
