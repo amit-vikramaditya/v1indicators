@@ -31,16 +31,14 @@ from ..foundational.overlap import (
     swma,
     t3,
     tema,
-    tma,
     trima,
     vidya,
     vwma,
     wcp,
     wma,
     zlema,
-    zlma,
 )
 
 kc = keltner
 
-__all__ = ["aberration", "accbands", "alma", "bbands", "dema", "donchian", "ema", "fibonacci_bbands", "fwma", "ha", "hilo", "hl2", "hlc3", "hma", "hwma", "ichimoku", "kalman_filter", "kama", "kc", "keltner", "linreg", "ma", "mcgd", "midpoint", "midprice", "multi_ma", "ohlc4", "pwma", "rma", "savgol", "sinwma", "sma", "smma", "ssf", "swma", "t3", "tema", "tma", "trima", "vidya", "vwma", "wcp", "wma", "zlema", "zlma"]
+__all__ = ["aberration", "accbands", "alma", "bbands", "dema", "donchian", "ema", "fibonacci_bbands", "fwma", "ha", "hilo", "hl2", "hlc3", "hma", "hwma", "ichimoku", "kalman_filter", "kama", "kc", "keltner", "linreg", "ma", "mcgd", "midpoint", "midprice", "multi_ma", "ohlc4", "pwma", "rma", "savgol", "sinwma", "sma", "smma", "ssf", "swma", "t3", "tema", "trima", "vidya", "vwma", "wcp", "wma", "zlema"]

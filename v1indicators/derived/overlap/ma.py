@@ -12,7 +12,7 @@ from ...foundational.overlap.tema import tema
 from ...foundational.overlap.trima import trima
 from ...foundational.overlap.vidya import vidya
 from ...foundational.overlap.wma import wma
-from ...foundational.overlap.zlma import zlma
+from ...foundational.overlap.zlema import zlema
 
 
 def ma(close: pd.Series, length: int = 10, mamode: str = "sma") -> pd.Series:
@@ -34,7 +34,10 @@ def ma(close: pd.Series, length: int = 10, mamode: str = "sma") -> pd.Series:
         "trima": lambda x: trima(x, length=length),
         "fwma": lambda x: fwma(x, length=length),
         "swma": lambda x: swma(x, length=length),
-        "zlma": lambda x: zlma(x, length=length),
+        "zlema": lambda x: zlema(x, length=length),
+        # Legacy key kept so ma(mamode="zlma") callers keep working; the
+        # standalone zlma indicator was removed as an exact duplicate.
+        "zlma": lambda x: zlema(x, length=length),
         "vidya": lambda x: vidya(x, length=length),
     }
     if mode not in table:

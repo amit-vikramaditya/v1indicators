@@ -1,3 +1,3 @@
-from ..foundational.statistics import entropy, fractional_difference, hurst, kurtosis, mad, median, quantile, skew, stdev, variance, variance_regime, zscore
+from ..foundational.statistics import entropy, fractional_difference, hurst, kurtosis, mad, quantile, skew, stdev, variance, variance_regime, zscore
 
-__all__ = ["stdev", "variance", "zscore", "median", "quantile", "mad", "kurtosis", "skew", "entropy", "fractional_difference", "hurst", "variance_regime"]
+__all__ = ["stdev", "variance", "zscore", "quantile", "mad", "kurtosis", "skew", "entropy", "fractional_difference", "hurst", "variance_regime"]

@@ -29,13 +29,11 @@ from .ssf import ssf
 from .swma import swma
 from .t3 import t3
 from .tema import tema
-from .tma import tma
 from .trima import trima
 from .vidya import vidya
 from .vwma import vwma
 from .wcp import wcp
 from .wma import wma
 from .zlema import zlema
-from .zlma import zlma
 
-__all__ = ["accbands", "alma", "bbands", "dema", "donchian", "ema", "fwma", "ha", "hilo", "hl2", "hlc3", "hma", "hwma", "ichimoku", "kalman_filter", "kama", "linreg", "mcgd", "midpoint", "midprice", "ohlc4", "pwma", "rma", "savgol", "sinwma", "sma", "smma", "ssf", "swma", "t3", "tema", "tma", "trima", "vidya", "vwma", "wcp", "wma", "zlema", "zlma"]
+__all__ = ["accbands", "alma", "bbands", "dema", "donchian", "ema", "fwma", "ha", "hilo", "hl2", "hlc3", "hma", "hwma", "ichimoku", "kalman_filter", "kama", "linreg", "mcgd", "midpoint", "midprice", "ohlc4", "pwma", "rma", "savgol", "sinwma", "sma", "smma", "ssf", "swma", "t3", "tema", "trima", "vidya", "vwma", "wcp", "wma", "zlema"]
