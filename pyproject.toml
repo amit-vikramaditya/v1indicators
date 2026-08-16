@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "v1indicators"
-version = "0.3.1"
+version = "1.0.0"
 description = "Technical analysis indicators and scanners."
 readme = "README.md"
 requires-python = ">=3.9"
@@ -41,9 +41,9 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/amit-vikramaditya/v1indicators"
-Repository = "https://github.com/amit-vikramaditya/v1indicators"
-Issues = "https://github.com/amit-vikramaditya/v1indicators/issues"
+Homepage = "https://github.com/Vatthu/v1indicators"
+Repository = "https://github.com/Vatthu/v1indicators"
+Issues = "https://github.com/Vatthu/v1indicators/issues"
 
 [tool.setuptools.packages.find]
 where = ["."]

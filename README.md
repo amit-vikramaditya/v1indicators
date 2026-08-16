@@ -11,10 +11,27 @@ The goal is simple: reliable indicator math on top of pandas Series/DataFrame in
 
 ## Highlights
 
+- **Causality-verified**: an automated prefix-invariance harness sweeps every
+  public function, so indicators are free of look-ahead bias / repainting by
+  construction (see "No look-ahead, verified" below).
 - Vectorized implementations for performance-critical paths.
 - Numba-accelerated kernels for recursive/stateful indicators where appropriate.
 - Consistent indicator signatures across categories.
 - Broad indicator coverage across overlap, momentum, trend, volatility, volume, statistics, levels, and performance.
+
+## No look-ahead, verified
+
+Every per-bar indicator is tested for **prefix invariance**: its values on the
+first K bars are identical whether computed on the full series or a truncated
+prefix. Repainting is therefore a test failure, not a surprise.
+
+- Pivot-family indicators (`support_resistance`, `market_structure`,
+  `zigzag_swings`, ...) are **causal by default**: levels and signals activate
+  only once the pivot is confirmed. `causal=False` restores retrospective
+  placement for plotting.
+- Documented exceptions: `dpo` (deprecated; look-ahead by definition),
+  `ichimoku`'s Chikou span (textbook definition), and `vp` (whole-series
+  snapshot semantics).
 
 ## Installation
 
@@ -113,6 +130,16 @@ Run the cross-indicator interoperability quality gate:
 ```bash
 pytest -q tests/test_interoperability_matrix.py
 ```
+
+Run the causality (no look-ahead) gate over every public function:
+
+```bash
+pytest -q tests/test_causality.py
+```
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) — 1.0.0 is the causality release.
 
 ## License
 
