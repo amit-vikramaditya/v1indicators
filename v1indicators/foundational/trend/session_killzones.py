@@ -27,8 +27,13 @@ def session_killzones(
     """
     Session killzone range tracker.
 
-    Computes active-session high/low and range for Asia, London, and NY AM windows.
-    Requires a DatetimeIndex.
+    Computes active-session high/low and range for Asia, London, and NY AM
+    windows. Requires a DatetimeIndex. Times are interpreted in the index's
+    own (naive or tz-aware) clock; there is no timezone conversion. A zone
+    with ``start > end`` wraps midnight (e.g. ``("22:00", "02:00")``); bars
+    after midnight are grouped with the session that started the previous
+    calendar day, so running extremes accumulate across the boundary. Zone
+    levels exist only while the zone is active (NaN outside).
     """
     high_s = check_series(high, "high")
     low_s = check_series(low, "low")
@@ -41,7 +46,18 @@ def session_killzones(
 
     def _zone(prefix: str, session: tuple[str, str]):
         mask = _session_mask(idx, session[0], session[1])
-        zone_day = pd.Series(idx.date, index=idx).where(mask)
+        dates = pd.Series(idx.date, index=idx)
+
+        sh, sm = map(int, session[0].split(":"))
+        eh, em = map(int, session[1].split(":"))
+        if sh * 60 + sm > eh * 60 + em:
+            # Wrapping zone: post-midnight bars join the previous day's
+            # session instead of starting a fresh group at 00:00.
+            post_midnight = mask & (idx.hour * 60 + idx.minute < eh * 60 + em)
+            prev_dates = pd.Series((idx - pd.Timedelta(days=1)).date, index=idx)
+            dates = dates.where(~post_midnight, prev_dates)
+
+        zone_day = dates.where(mask)
         z_high = high_s.where(mask).groupby(zone_day).cummax()
         z_low = low_s.where(mask).groupby(zone_day).cummin()
         z_range = z_high - z_low

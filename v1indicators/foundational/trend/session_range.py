@@ -13,7 +13,13 @@ def session_range(
     """
     Intraday session high/low/range tracker.
 
-    Requires DatetimeIndex and computes running session bounds for each day.
+    Requires a DatetimeIndex and computes running session bounds for each
+    day. Times are interpreted in the index's own (naive or tz-aware) clock;
+    there is no timezone conversion. ``start > end`` defines an overnight
+    session that wraps midnight (e.g. ``"22:00", "04:00"``); bars after
+    midnight belong to the session that started the previous calendar day,
+    so the running high/low accumulate across the boundary. Bounds exist
+    only while the session is active (NaN outside).
     """
     high_s = check_series(high, "high")
     low_s = check_series(low, "low")
@@ -29,8 +35,18 @@ def session_range(
     smin = sh * 60 + sm
     emin = eh * 60 + em
 
-    active = (minutes >= smin) & (minutes < emin)
-    day_key = pd.Series(idx.date, index=idx).where(active)
+    if smin <= emin:
+        active = (minutes >= smin) & (minutes < emin)
+        day_key = pd.Series(idx.date, index=idx)
+    else:
+        # Overnight session: active on both sides of midnight. Post-midnight
+        # bars join the session that started the previous calendar day.
+        active = (minutes >= smin) | (minutes < emin)
+        dates = pd.Series(idx.date, index=idx)
+        prev_dates = pd.Series((idx - pd.Timedelta(days=1)).date, index=idx)
+        day_key = dates.where(~(active & (minutes < emin)), prev_dates)
+
+    day_key = day_key.where(active)
 
     session_high = high_s.where(active).groupby(day_key).cummax()
     session_low = low_s.where(active).groupby(day_key).cummin()
