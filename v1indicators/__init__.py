@@ -129,6 +129,7 @@ VOLATILITY_SYMBOLS = (
 )
 
 TREND_SYMBOLS = (
+    "range_filter",
     "adx",
     "supertrend",
     "psar",

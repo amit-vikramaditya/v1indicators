@@ -3,54 +3,11 @@ import pandas as pd
 from numba import njit
 
 from .._utils import check_series
+from .range_filter import range_filter
 from ...foundational.overlap.ema import ema
 from ...derived.trend.adx import adx
 from ...foundational.volatility.atr import atr
 from ...foundational.volatility.chop import chop
-
-
-@njit
-def _range_filter_kernel(src_v: np.ndarray, rng_v: np.ndarray):
-    n = src_v.shape[0]
-    filt = np.full(n, np.nan, dtype=np.float64)
-    trend = np.zeros(n, dtype=np.int8)
-    signal = np.zeros(n, dtype=np.int8)
-
-    if n == 0:
-        return filt, trend, signal
-
-    filt[0] = src_v[0]
-    for i in range(1, n):
-        prev_f = filt[i - 1]
-        prev_t = trend[i - 1]
-        cur_src = src_v[i]
-        cur_rng = rng_v[i]
-
-        if np.isnan(prev_f) or np.isnan(cur_src) or np.isnan(cur_rng):
-            filt[i] = prev_f
-            trend[i] = prev_t
-            signal[i] = 0
-            continue
-
-        if cur_src > prev_f + cur_rng:
-            cur_f = cur_src - cur_rng
-        elif cur_src < prev_f - cur_rng:
-            cur_f = cur_src + cur_rng
-        else:
-            cur_f = prev_f
-
-        if cur_f > prev_f:
-            cur_t = 1
-        elif cur_f < prev_f:
-            cur_t = -1
-        else:
-            cur_t = prev_t
-
-        filt[i] = cur_f
-        trend[i] = cur_t
-        signal[i] = cur_t if cur_t != prev_t else 0
-
-    return filt, trend, signal
 
 
 def range_filter_confluence(
@@ -94,15 +51,16 @@ def range_filter_confluence(
     close_s = check_series(close, "close")
 
     atr_s = atr(high_s, low_s, close_s, length=atr_length)
-    range_s = atr_s * float(atr_multiplier) * (float(sensitivity) / 8.0)
 
-    filt, trend, rf_sig = _range_filter_kernel(
-        close_s.to_numpy(dtype=np.float64),
-        range_s.to_numpy(dtype=np.float64),
+    rf_df = range_filter(
+        high_s, low_s, close_s,
+        sensitivity=sensitivity,
+        atr_length=atr_length,
+        atr_multiplier=atr_multiplier,
     )
-
-    trend_s = pd.Series(trend, index=close_s.index)
-    rf_sig_s = pd.Series(rf_sig, index=close_s.index)
+    filt = rf_df["RANGE_FILTER"].to_numpy(dtype=np.float64)
+    trend_s = rf_df["RANGE_FILTER_TREND"]
+    rf_sig_s = rf_df["RANGE_FILTER_SIGNAL"]
 
     adx_df = adx(high_s, low_s, close_s, length=adx_length)
     adx_col = f"ADX_{adx_length}"
@@ -144,13 +102,18 @@ def range_filter_confluence(
         + mom_partial.astype(np.float64)
     ).clip(upper=4.0)
 
-    range_12 = atr_s * float(atr_multiplier) * (12.0 / 8.0)
-    range_16 = atr_s * float(atr_multiplier) * (16.0 / 8.0)
-    _, trend_12, _ = _range_filter_kernel(close_s.to_numpy(dtype=np.float64), range_12.to_numpy(dtype=np.float64))
-    _, trend_16, _ = _range_filter_kernel(close_s.to_numpy(dtype=np.float64), range_16.to_numpy(dtype=np.float64))
-
-    trend_12_s = pd.Series(trend_12, index=close_s.index)
-    trend_16_s = pd.Series(trend_16, index=close_s.index)
+    trend_12_s = range_filter(
+        high_s, low_s, close_s,
+        sensitivity=12,
+        atr_length=atr_length,
+        atr_multiplier=atr_multiplier,
+    )["RANGE_FILTER_TREND"]
+    trend_16_s = range_filter(
+        high_s, low_s, close_s,
+        sensitivity=16,
+        atr_length=atr_length,
+        atr_multiplier=atr_multiplier,
+    )["RANGE_FILTER_TREND"]
 
     score_sens = ((trend_12_s == trend_s).astype(np.float64) * 2.0) + ((trend_16_s == trend_s).astype(np.float64) * 1.0)
 
