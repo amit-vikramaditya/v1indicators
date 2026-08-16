@@ -20,7 +20,7 @@ def test_ema_basic():
     # 2nd value: (2/3)*11 + (1/3)*10 = 7.33 + 3.33 = 10.66...
     
     # Let's verify against pandas directly
-    expected = data.ewm(span=2, adjust=False).mean()
+    expected = data.ewm(span=2, adjust=False, min_periods=2).mean()
     pd.testing.assert_series_equal(result, expected, check_names=False)
 
 def test_ema_length_1():

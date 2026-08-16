@@ -33,6 +33,6 @@ def adosc(
     volume_s = check_series(volume, "volume")
 
     adl = _adl_line(high_s, low_s, close_s, volume_s)
-    out = adl.ewm(span=fast, adjust=False).mean() - adl.ewm(span=slow, adjust=False).mean()
+    out = adl.ewm(span=fast, adjust=False, min_periods=fast).mean() - adl.ewm(span=slow, adjust=False, min_periods=slow).mean()
     out.name = f"ADOSC_{fast}_{slow}"
     return out

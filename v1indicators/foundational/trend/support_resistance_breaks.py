@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 
 from .._utils import check_series
+from ..._causal import warn_if_non_causal
 
 
 def support_resistance_breaks(
@@ -38,6 +39,7 @@ def support_resistance_breaks(
     if volume_fast <= 0 or volume_slow <= 0:
         raise ValueError("volume_fast and volume_slow must be > 0")
 
+    open_s = warn_if_non_causal("support_resistance_breaks", causal)
     open_s = check_series(open_, "open_")
     high_s = check_series(high, "high")
     low_s = check_series(low, "low")
@@ -55,8 +57,8 @@ def support_resistance_breaks(
     resistance = pivot_high.ffill()
     support = pivot_low.ffill()
 
-    vol_fast = volume_s.ewm(span=volume_fast, adjust=False).mean()
-    vol_slow = volume_s.ewm(span=volume_slow, adjust=False).mean().replace(0.0, np.nan)
+    vol_fast = volume_s.ewm(span=volume_fast, adjust=False, min_periods=volume_fast).mean()
+    vol_slow = volume_s.ewm(span=volume_slow, adjust=False, min_periods=volume_slow).mean().replace(0.0, np.nan)
     vol_osc = 100.0 * (vol_fast - vol_slow) / vol_slow
 
     prev_close = close_s.shift(1)

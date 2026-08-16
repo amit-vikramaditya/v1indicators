@@ -20,10 +20,10 @@ def pvo(
 
     volume_s = check_series(volume, "volume")
 
-    ema_fast = volume_s.ewm(span=fast, adjust=False).mean()
-    ema_slow = volume_s.ewm(span=slow, adjust=False).mean().replace(0.0, np.nan)
+    ema_fast = volume_s.ewm(span=fast, adjust=False, min_periods=fast).mean()
+    ema_slow = volume_s.ewm(span=slow, adjust=False, min_periods=slow).mean().replace(0.0, np.nan)
     pvo_line = 100.0 * (ema_fast - ema_slow) / ema_slow
-    signal_line = pvo_line.ewm(span=signal, adjust=False).mean()
+    signal_line = pvo_line.ewm(span=signal, adjust=False, min_periods=signal).mean()
     hist = pvo_line - signal_line
 
     return pd.DataFrame(

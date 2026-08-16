@@ -13,8 +13,8 @@ def qqe(close: pd.Series, length: int = 14, smooth: int = 5, factor: float = 4.2
 
     close_s = check_series(close, "close")
     r = rsi(close_s, length=length)
-    rs = r.ewm(span=smooth, adjust=False).mean()
-    dr = rs.diff().abs().ewm(span=length, adjust=False).mean()
+    rs = r.ewm(span=smooth, adjust=False, min_periods=smooth).mean()
+    dr = rs.diff().abs().ewm(span=length, adjust=False, min_periods=length).mean()
     dar = factor * dr
 
     upper = rs + dar

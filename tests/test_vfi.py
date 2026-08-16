@@ -36,7 +36,7 @@ def test_vfi_basic():
     mf = typical - typical.shift(1)
     vcp = pd.Series(np.where(mf > cutoff, vc, np.where(mf < -cutoff, -vc, 0.0)), index=close.index)
     expected_vfi = vcp.rolling(4).sum() / vave.replace(0.0, np.nan)
-    expected_signal = expected_vfi.ewm(span=3, adjust=False).mean()
+    expected_signal = expected_vfi.ewm(span=3, adjust=False, min_periods=3).mean()
     expected_hist = expected_vfi - expected_signal
 
     expected = pd.DataFrame(

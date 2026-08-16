@@ -25,9 +25,9 @@ def smi(
     m = close_s - (hh + ll) / 2.0
     d = (hh - ll) / 2.0
 
-    sm = m.ewm(span=fast, adjust=False).mean().ewm(span=slow, adjust=False).mean()
-    sd = d.ewm(span=fast, adjust=False).mean().ewm(span=slow, adjust=False).mean()
+    sm = m.ewm(span=fast, adjust=False, min_periods=fast).mean().ewm(span=slow, adjust=False, min_periods=slow).mean()
+    sd = d.ewm(span=fast, adjust=False, min_periods=fast).mean().ewm(span=slow, adjust=False, min_periods=slow).mean()
     smi_line = 100.0 * sm / sd.replace(0.0, pd.NA)
-    sig = smi_line.ewm(span=signal, adjust=False).mean()
+    sig = smi_line.ewm(span=signal, adjust=False, min_periods=signal).mean()
 
     return pd.DataFrame({"SMI": smi_line, "SMI_SIGNAL": sig})

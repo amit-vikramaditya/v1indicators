@@ -10,9 +10,9 @@ def tsi(close: pd.Series, fast: int = 13, slow: int = 25, signal: int = 13) -> p
 
     close_s = check_series(close, "close")
     m = close_s.diff()
-    ema1 = m.ewm(span=slow, adjust=False).mean().ewm(span=fast, adjust=False).mean()
-    ema2 = m.abs().ewm(span=slow, adjust=False).mean().ewm(span=fast, adjust=False).mean()
+    ema1 = m.ewm(span=slow, adjust=False, min_periods=slow).mean().ewm(span=fast, adjust=False, min_periods=fast).mean()
+    ema2 = m.abs().ewm(span=slow, adjust=False, min_periods=slow).mean().ewm(span=fast, adjust=False, min_periods=fast).mean()
 
     tsi_line = 100.0 * ema1 / ema2.replace(0.0, pd.NA)
-    sig = tsi_line.ewm(span=signal, adjust=False).mean()
+    sig = tsi_line.ewm(span=signal, adjust=False, min_periods=signal).mean()
     return pd.DataFrame({"TSI": tsi_line, "TSI_SIGNAL": sig})

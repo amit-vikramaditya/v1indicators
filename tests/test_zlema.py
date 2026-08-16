@@ -10,7 +10,7 @@ def test_zlema_basic():
 
     lag = int((4 - 1) / 2)
     adjusted = close + (close - close.shift(lag))
-    expected = adjusted.ewm(span=4, adjust=False).mean()
+    expected = adjusted.ewm(span=4, adjust=False, min_periods=4).mean()
     expected.name = "ZLEMA_4"
 
     pd.testing.assert_series_equal(result, expected)

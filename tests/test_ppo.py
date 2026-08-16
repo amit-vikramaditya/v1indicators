@@ -8,8 +8,8 @@ def test_ppo_basic():
     close = pd.Series([10.0, 11.0, 12.0, 13.0, 14.0, 15.0])
     result = ppo(close, fast=2, slow=4)
 
-    ema_fast = close.ewm(span=2, adjust=False).mean()
-    ema_slow = close.ewm(span=4, adjust=False).mean()
+    ema_fast = close.ewm(span=2, adjust=False, min_periods=2).mean()
+    ema_slow = close.ewm(span=4, adjust=False, min_periods=4).mean()
     expected = 100.0 * (ema_fast - ema_slow) / ema_slow
     expected.name = "PPO_2_4"
 

@@ -1,6 +1,7 @@
 import pandas as pd
 
 from .._utils import check_series
+from ..._causal import warn_if_non_causal
 
 
 def ichimoku(
@@ -50,6 +51,7 @@ def ichimoku(
     if min(tenkan, kijun, senkou_b) <= 0:
         raise ValueError("periods must be > 0")
 
+    high_s = warn_if_non_causal("ichimoku", causal)
     high_s = check_series(high, "high")
     low_s = check_series(low, "low")
     close_s = check_series(close, "close")

@@ -9,8 +9,8 @@ def test_macd_state_basic_sma_signal():
 
     result = macd_state(close, fast=3, slow=5, signal=2, signal_ma="sma")
 
-    fast_ema = close.ewm(span=3, adjust=False).mean()
-    slow_ema = close.ewm(span=5, adjust=False).mean()
+    fast_ema = close.ewm(span=3, adjust=False, min_periods=3).mean()
+    slow_ema = close.ewm(span=5, adjust=False, min_periods=5).mean()
     macd_line = fast_ema - slow_ema
     signal_line = macd_line.rolling(2).mean()
     hist = macd_line - signal_line

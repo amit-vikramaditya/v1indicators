@@ -25,11 +25,11 @@ def wavetrend(
     close_s = check_series(close, "close")
 
     ap = (high_s + low_s + close_s) / 3.0
-    esa = ap.ewm(span=channel_length, adjust=False).mean()
-    d = (ap - esa).abs().ewm(span=channel_length, adjust=False).mean().replace(0.0, np.nan)
+    esa = ap.ewm(span=channel_length, adjust=False, min_periods=channel_length).mean()
+    d = (ap - esa).abs().ewm(span=channel_length, adjust=False, min_periods=channel_length).mean().replace(0.0, np.nan)
     ci = (ap - esa) / (0.015 * d)
 
-    wt1 = ci.ewm(span=average_length, adjust=False).mean()
+    wt1 = ci.ewm(span=average_length, adjust=False, min_periods=average_length).mean()
     wt2 = wt1.rolling(signal_length).mean()
     hist = wt1 - wt2
 

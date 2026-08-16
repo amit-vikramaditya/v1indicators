@@ -23,8 +23,8 @@ def aobv(
     volume_s = check_series(volume, "volume")
 
     obv_s = obv(close_s, volume_s)
-    maf = obv_s.ewm(span=fast, adjust=False).mean()
-    mas = obv_s.ewm(span=slow, adjust=False).mean()
+    maf = obv_s.ewm(span=fast, adjust=False, min_periods=fast).mean()
+    mas = obv_s.ewm(span=slow, adjust=False, min_periods=slow).mean()
 
     lr = long_run(maf, mas, length=run_length)
     sr = short_run(maf, mas, length=run_length)

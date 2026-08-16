@@ -13,10 +13,10 @@ def test_wavetrend_basic():
     result = wavetrend(high, low, close, channel_length=3, average_length=4, signal_length=2)
 
     ap = (high + low + close) / 3.0
-    esa = ap.ewm(span=3, adjust=False).mean()
-    d = (ap - esa).abs().ewm(span=3, adjust=False).mean().replace(0.0, np.nan)
+    esa = ap.ewm(span=3, adjust=False, min_periods=3).mean()
+    d = (ap - esa).abs().ewm(span=3, adjust=False, min_periods=3).mean().replace(0.0, np.nan)
     ci = (ap - esa) / (0.015 * d)
-    wt1 = ci.ewm(span=4, adjust=False).mean()
+    wt1 = ci.ewm(span=4, adjust=False, min_periods=4).mean()
     wt2 = wt1.rolling(2).mean()
     hist = wt1 - wt2
 

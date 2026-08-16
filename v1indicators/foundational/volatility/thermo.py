@@ -22,7 +22,7 @@ def thermo(
     thermo_l = (low_s.shift(1) - low_s).abs()
     thermo_h = (high_s - high_s.shift(1)).abs()
     t = pd.concat([thermo_l, thermo_h], axis=1).max(axis=1)
-    t_ma = t.ewm(span=length, adjust=False).mean()
+    t_ma = t.ewm(span=length, adjust=False, min_periods=length).mean()
     t_long = (t < (t_ma * long)).astype(int)
     t_short = (t > (t_ma * short)).astype(int)
 

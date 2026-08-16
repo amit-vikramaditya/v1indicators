@@ -7,7 +7,7 @@ from v1indicators.overlap import smma
 def test_smma_basic():
     close = pd.Series([10.0, 11.0, 12.0, 11.0, 13.0])
     result = smma(close, length=3)
-    expected = close.ewm(alpha=1.0 / 3.0, adjust=False).mean()
+    expected = close.ewm(alpha=1.0 / 3.0, adjust=False, min_periods=3).mean()
     expected.name = "SMMA_3"
     pd.testing.assert_series_equal(result, expected)
 

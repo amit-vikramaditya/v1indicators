@@ -13,7 +13,7 @@ def _logistic_prob(series: pd.Series, mean_lookback: int, slope: float, smooth_l
         1.0 / (1.0 + np.exp(-z_clipped.to_numpy())),
         index=series.index,
     )
-    return raw.ewm(span=smooth_len, adjust=False).mean()
+    return raw.ewm(span=smooth_len, adjust=False, min_periods=smooth_len).mean()
 
 
 def _crossover(a: pd.Series, b: pd.Series) -> pd.Series:
@@ -70,11 +70,11 @@ def directional_logistic_oscillator(
     net_direction = prob_plus - prob_minus
     strength_raw = net_direction * prob_adx * oscillator_scale
     strength_bound = pd.Series(np.tanh(strength_raw.to_numpy()), index=strength_raw.index)
-    strength = strength_bound.ewm(span=probability_smoothing, adjust=False).mean()
+    strength = strength_bound.ewm(span=probability_smoothing, adjust=False, min_periods=probability_smoothing).mean()
 
     s_sma = strength.rolling(oscillator_smoothing).mean()
-    s_ema = strength.ewm(span=oscillator_smoothing, adjust=False).mean()
-    s_sma_cycle = s_sma.ewm(span=int(np.ceil(oscillator_smoothing / 2.0)), adjust=False).mean()
+    s_ema = strength.ewm(span=oscillator_smoothing, adjust=False, min_periods=oscillator_smoothing).mean()
+    s_sma_cycle = s_sma.ewm(span=int(np.ceil(oscillator_smoothing / 2.0)), adjust=False, min_periods=int(np.ceil(oscillator_smoothing / 2.0))).mean()
 
     lower_sma = s_sma.rolling(mean_lookback).quantile(0.10, interpolation="nearest")
     upper_sma = s_sma.rolling(mean_lookback).quantile(0.90, interpolation="nearest")

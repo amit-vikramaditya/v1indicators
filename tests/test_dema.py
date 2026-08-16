@@ -8,8 +8,8 @@ def test_dema_basic():
     close = pd.Series([1.0, 2.0, 3.0, 4.0, 5.0, 6.0])
     result = dema(close, length=3)
 
-    ema1 = close.ewm(span=3, adjust=False).mean()
-    ema2 = ema1.ewm(span=3, adjust=False).mean()
+    ema1 = close.ewm(span=3, adjust=False, min_periods=3).mean()
+    ema2 = ema1.ewm(span=3, adjust=False, min_periods=3).mean()
     expected = 2.0 * ema1 - ema2
     expected.name = "DEMA_3"
 

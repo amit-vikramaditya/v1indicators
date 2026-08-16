@@ -8,8 +8,8 @@ def test_multi_ma_basic_with_ema():
     close = pd.Series([10.0, 11.0, 12.0, 11.5, 12.5, 13.0, 12.8])
     result = multi_ma(close, length1=3, ma_type1="ema", length2=5, ma_type2="ema")
 
-    fast = close.ewm(span=3, adjust=False).mean()
-    slow = close.ewm(span=5, adjust=False).mean()
+    fast = close.ewm(span=3, adjust=False, min_periods=3).mean()
+    slow = close.ewm(span=5, adjust=False, min_periods=5).mean()
 
     pd.testing.assert_series_equal(result["MA_FAST"], fast, check_names=False)
     pd.testing.assert_series_equal(result["MA_SLOW"], slow, check_names=False)

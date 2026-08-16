@@ -30,7 +30,7 @@ def macd_state(
     if ma_kind == "sma":
         signal_line = macd_line.rolling(signal).mean()
     else:
-        signal_line = macd_line.ewm(span=signal, adjust=False).mean()
+        signal_line = macd_line.ewm(span=signal, adjust=False, min_periods=signal).mean()
 
     hist = macd_line - signal_line
     prev_hist = hist.shift(1)

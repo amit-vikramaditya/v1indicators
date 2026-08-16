@@ -8,12 +8,12 @@ def test_t3_basic():
     close = pd.Series([10.0, 11.0, 12.0, 11.5, 12.5, 13.0, 14.0])
     result = t3(close, length=3, factor=0.7)
 
-    e1 = close.ewm(span=3, adjust=False).mean()
-    e2 = e1.ewm(span=3, adjust=False).mean()
-    e3 = e2.ewm(span=3, adjust=False).mean()
-    e4 = e3.ewm(span=3, adjust=False).mean()
-    e5 = e4.ewm(span=3, adjust=False).mean()
-    e6 = e5.ewm(span=3, adjust=False).mean()
+    e1 = close.ewm(span=3, adjust=False, min_periods=3).mean()
+    e2 = e1.ewm(span=3, adjust=False, min_periods=3).mean()
+    e3 = e2.ewm(span=3, adjust=False, min_periods=3).mean()
+    e4 = e3.ewm(span=3, adjust=False, min_periods=3).mean()
+    e5 = e4.ewm(span=3, adjust=False, min_periods=3).mean()
+    e6 = e5.ewm(span=3, adjust=False, min_periods=3).mean()
 
     a = 0.7
     c1 = -a**3

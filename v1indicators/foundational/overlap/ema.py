@@ -17,14 +17,15 @@ def ema(close: pd.Series, length: int = 20, adjust: bool = False) -> pd.Series:
         adjust: If True, uses Pandas' legacy pre-mean adjustment (default False).
 
     Returns:
-        Pandas Series named 'EMA_{length}'.
+        Pandas Series named 'EMA_{length}'. NaN until `length` bars have
+        elapsed (warmup), then the recursive EMA seeded at the first bar.
     """
     if length <= 0:
         raise ValueError("length must be > 0")
 
     series = check_series(close, "close")
-    
-    result = series.ewm(span=length, adjust=adjust).mean()
+
+    result = series.ewm(span=length, adjust=adjust, min_periods=length).mean()
     result.name = f"EMA_{length}"
     return result
 

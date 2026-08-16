@@ -9,6 +9,9 @@ def t3(close: pd.Series, length: int = 10, factor: float = 0.7) -> pd.Series:
 
     The T3 is a smooth moving average based on cascaded EMAs and
     a volume factor ("factor").
+
+    NaN during warmup: valid once all six nested EMA stages have
+    `length` non-NaN observations (first value at bar 6*(length-1)).
     """
     if length <= 0:
         raise ValueError("length must be > 0")
@@ -17,12 +20,12 @@ def t3(close: pd.Series, length: int = 10, factor: float = 0.7) -> pd.Series:
 
     close_s = check_series(close, "close")
 
-    e1 = close_s.ewm(span=length, adjust=False).mean()
-    e2 = e1.ewm(span=length, adjust=False).mean()
-    e3 = e2.ewm(span=length, adjust=False).mean()
-    e4 = e3.ewm(span=length, adjust=False).mean()
-    e5 = e4.ewm(span=length, adjust=False).mean()
-    e6 = e5.ewm(span=length, adjust=False).mean()
+    e1 = close_s.ewm(span=length, adjust=False, min_periods=length).mean()
+    e2 = e1.ewm(span=length, adjust=False, min_periods=length).mean()
+    e3 = e2.ewm(span=length, adjust=False, min_periods=length).mean()
+    e4 = e3.ewm(span=length, adjust=False, min_periods=length).mean()
+    e5 = e4.ewm(span=length, adjust=False, min_periods=length).mean()
+    e6 = e5.ewm(span=length, adjust=False, min_periods=length).mean()
 
     a = float(factor)
     c1 = -a**3

@@ -34,7 +34,11 @@ def test_ema_matches_naive_recursive_loop_exactly():
     for i in range(1, len(ref)):
         ref[i] = alpha * ref[i] * 0 + alpha * close.iloc[i] + (1 - alpha) * ref[i - 1]
     out = ema(close, length=length).to_numpy()
-    assert np.allclose(out, ref, rtol=0, atol=1e-10)
+    # NaN warmup for the first length-1 bars, then exact recursion parity:
+    # min_periods masks the transient; it does not alter the recursion.
+    assert np.isnan(out[: length - 1]).all()
+    assert not np.isnan(out[length - 1])
+    assert np.allclose(out[length - 1:], ref[length - 1:], rtol=0, atol=1e-10)
 
 
 def test_rma_matches_naive_wilder_loop_exactly():
@@ -45,7 +49,9 @@ def test_rma_matches_naive_wilder_loop_exactly():
     for i in range(1, len(ref)):
         ref[i] = alpha * close.iloc[i] + (1 - alpha) * ref[i - 1]
     out = rma(close, length=length).to_numpy()
-    assert np.allclose(out, ref, rtol=0, atol=1e-10)
+    assert np.isnan(out[: length - 1]).all()
+    assert not np.isnan(out[length - 1])
+    assert np.allclose(out[length - 1:], ref[length - 1:], rtol=0, atol=1e-10)
 
 
 def test_cci_matches_textbook_mad_reference_exactly():

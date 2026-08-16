@@ -16,8 +16,8 @@ def ppo(close: pd.Series, fast: int = 12, slow: int = 26) -> pd.Series:
         raise ValueError("fast must be < slow")
 
     close_s = check_series(close, "close")
-    ema_fast = close_s.ewm(span=fast, adjust=False).mean()
-    ema_slow = close_s.ewm(span=slow, adjust=False).mean().replace(0.0, np.nan)
+    ema_fast = close_s.ewm(span=fast, adjust=False, min_periods=fast).mean()
+    ema_slow = close_s.ewm(span=slow, adjust=False, min_periods=slow).mean().replace(0.0, np.nan)
 
     result = 100.0 * (ema_fast - ema_slow) / ema_slow
     result.name = f"PPO_{fast}_{slow}"

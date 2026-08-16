@@ -21,8 +21,8 @@ def kdj(
     ll = low_s.rolling(length).min()
     hh = high_s.rolling(length).max()
     rsv = 100.0 * (close_s - ll) / (hh - ll).replace(0.0, pd.NA)
-    k = rsv.ewm(span=signal, adjust=False).mean()
-    d = k.ewm(span=signal, adjust=False).mean()
+    k = rsv.ewm(span=signal, adjust=False, min_periods=signal).mean()
+    d = k.ewm(span=signal, adjust=False, min_periods=signal).mean()
     j = 3.0 * k - 2.0 * d
 
     return pd.DataFrame({"KDJ_K": k, "KDJ_D": d, "KDJ_J": j})

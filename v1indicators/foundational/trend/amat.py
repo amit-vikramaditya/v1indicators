@@ -9,8 +9,8 @@ def amat(close: pd.Series, fast: int = 8, slow: int = 21) -> pd.DataFrame:
         raise ValueError("fast and slow must be > 0")
 
     close_s = check_series(close, "close")
-    ema_fast = close_s.ewm(span=fast, adjust=False).mean()
-    ema_slow = close_s.ewm(span=slow, adjust=False).mean()
+    ema_fast = close_s.ewm(span=fast, adjust=False, min_periods=fast).mean()
+    ema_slow = close_s.ewm(span=slow, adjust=False, min_periods=slow).mean()
 
     long_state = (ema_fast > ema_slow).astype(int)
     short_state = (ema_fast < ema_slow).astype(int)

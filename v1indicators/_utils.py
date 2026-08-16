@@ -2,6 +2,13 @@ import pandas as pd
 import numpy as np
 from typing import Optional
 
+def _check_sorted_index(data: pd.Series, name: str) -> None:
+    """Bar data must be time-ordered: every indicator assumes bar i+1 follows
+    bar i, and an unsorted index silently produces garbage (rolling windows,
+    cumsums and recursive kernels all scramble). Fail loudly instead."""
+    if not data.index.is_monotonic_increasing:
+        raise ValueError(f"{name} index must be sorted in ascending order")
+
 def validate_series(data: pd.Series, name: str = "data") -> np.ndarray:
     """
     Validates that input is a Pandas Series and returns its numpy values (float64).
@@ -9,10 +16,12 @@ def validate_series(data: pd.Series, name: str = "data") -> np.ndarray:
     """
     if not isinstance(data, pd.Series):
         raise TypeError(f"{name} must be a pandas Series")
-    
+
     if data.empty:
         raise ValueError(f"{name} is empty")
-    
+
+    _check_sorted_index(data, name)
+
     # Prefer zero-copy where possible and make sure the output is contiguous
     # for downstream NumPy/Numba kernels.
     values = data.to_numpy(dtype=np.float64, copy=False)
@@ -27,10 +36,12 @@ def check_series(data: pd.Series, name: str = "data") -> pd.Series:
     """
     if not isinstance(data, pd.Series):
         raise TypeError(f"{name} must be a pandas Series")
-    
+
     if data.empty:
         raise ValueError(f"{name} is empty")
-    
+
+    _check_sorted_index(data, name)
+
     if data.dtype == np.float64:
         return data
 

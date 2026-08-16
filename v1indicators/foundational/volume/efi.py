@@ -14,6 +14,6 @@ def efi(close: pd.Series, volume: pd.Series, length: int = 13, drift: int = 1) -
     volume_s = check_series(volume, "volume")
 
     raw = close_s.diff(drift) * volume_s
-    out = raw.ewm(span=length, adjust=False).mean()
+    out = raw.ewm(span=length, adjust=False, min_periods=length).mean()
     out.name = f"EFI_{length}"
     return out

@@ -18,8 +18,8 @@ def rvi(close: pd.Series, length: int = 14, scalar: float = 100.0, drift: int = 
     pos = (delta > 0.0).astype(float)
     neg = (delta < 0.0).astype(float)
 
-    pos_avg = (pos * std).ewm(span=length, adjust=False).mean()
-    neg_avg = (neg * std).ewm(span=length, adjust=False).mean()
+    pos_avg = (pos * std).ewm(span=length, adjust=False, min_periods=length).mean()
+    neg_avg = (neg * std).ewm(span=length, adjust=False, min_periods=length).mean()
 
     out = scalar * pos_avg / (pos_avg + neg_avg).replace(0.0, np.nan)
     out.name = f"RVI_{length}"

@@ -56,7 +56,7 @@ def vfi(
     if smooth:
         vfi_line = vfi_line.rolling(3).mean()
 
-    signal_line = vfi_line.ewm(span=signal, adjust=False).mean()
+    signal_line = vfi_line.ewm(span=signal, adjust=False, min_periods=signal).mean()
     hist = vfi_line - signal_line
 
     return pd.DataFrame(

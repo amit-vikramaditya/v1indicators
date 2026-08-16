@@ -15,8 +15,8 @@ def test_ema_rsi_signal_basic():
         rsi_sell_level=45.0,
     )
 
-    fast = close.ewm(span=3, adjust=False).mean()
-    slow = close.ewm(span=5, adjust=False).mean()
+    fast = close.ewm(span=3, adjust=False, min_periods=3).mean()
+    slow = close.ewm(span=5, adjust=False, min_periods=5).mean()
 
     pd.testing.assert_series_equal(result["EMA_FAST"], fast, check_names=False)
     pd.testing.assert_series_equal(result["EMA_SLOW"], slow, check_names=False)

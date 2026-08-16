@@ -12,7 +12,7 @@ def eri(high: pd.Series, low: pd.Series, close: pd.Series, length: int = 13) -> 
     low_s = check_series(low, "low")
     close_s = check_series(close, "close")
 
-    ema = close_s.ewm(span=length, adjust=False).mean()
+    ema = close_s.ewm(span=length, adjust=False, min_periods=length).mean()
     bull = high_s - ema
     bear = low_s - ema
 

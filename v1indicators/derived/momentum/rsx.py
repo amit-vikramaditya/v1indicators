@@ -11,6 +11,6 @@ def rsx(close: pd.Series, length: int = 14) -> pd.Series:
 
     close_s = check_series(close, "close")
     r = rsi(close_s, length=length)
-    out = r.ewm(span=length, adjust=False).mean().ewm(span=length, adjust=False).mean()
+    out = r.ewm(span=length, adjust=False, min_periods=length).mean().ewm(span=length, adjust=False, min_periods=length).mean()
     out.name = f"RSX_{length}"
     return out

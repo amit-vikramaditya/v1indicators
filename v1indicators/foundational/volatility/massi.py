@@ -14,8 +14,8 @@ def massi(high: pd.Series, low: pd.Series, fast: int = 9, slow: int = 25) -> pd.
         fast, slow = slow, fast
 
     hl_range = (high_s - low_s).abs()
-    ema1 = hl_range.ewm(span=fast, adjust=False).mean()
-    ema2 = ema1.ewm(span=fast, adjust=False).mean()
+    ema1 = hl_range.ewm(span=fast, adjust=False, min_periods=fast).mean()
+    ema2 = ema1.ewm(span=fast, adjust=False, min_periods=fast).mean()
 
     out = (ema1 / ema2).rolling(slow).sum()
     out.name = f"MASSI_{fast}_{slow}"
