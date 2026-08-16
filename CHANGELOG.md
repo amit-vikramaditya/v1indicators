@@ -42,24 +42,32 @@ causal output.
 
 ### Fixes and documentation
 
-- `atr` gained `mamode="rma"` (Wilder's original recursive smoothing); the
-  docstring now states truthfully that the default `ema` (span) mode is not
-  Wilder's smoothing.
+- **BREAKING:** `atr` now defaults to `mamode="rma"` — Wilder's original
+  recursive smoothing, the textbook ATR (ta-lib / TradingView parity). The
+  pre-1.0 behaviour is available with `mamode="ema"`. All ATR-based
+  indicators (supertrend, range_filter, confluence engines, ...) follow the
+  new default.
 - Undocumented look-ahead bugs fixed in `support_resistance` and
   `equal_highs_lows` (pivots previously activated at the pivot bar, knowable
   only `right`/`length` bars later).
-- `dpo` now emits `DeprecationWarning`: it is look-ahead by definition.
-- `vp` documents SNAPSHOT semantics (whole-series bins).
+- **Removed** `dpo` (look-ahead by definition: price displaced backward by
+  `length//2+1`; a visual detrending aid, never a causal signal) and `vp`
+  (whole-series snapshot semantics, not a per-bar indicator).
 - Reference-math parity tests pin exact textbook behaviour for EMA, RMA and
   CCI-with-MAD, and quantify the documented warmup-convention differences
   for RSI and ATR-rma.
+
+### Removals
+
+- `dpo`: look-ahead by definition (see above).
+- `vp`: snapshot semantics incompatible with the per-bar causality contract.
 
 ### Quality gates
 
 - `tests/test_causality.py` sweeps **every public function** with
   prefix-invariance checks across five cut points. The only permitted
-  exceptions are documented in-code: `dpo` and `ichimoku` (by-definition
-  look-ahead, strict xfails) and `vp` (snapshot).
+  exception is documented in-code: `ichimoku` (Chikou span is look-ahead by
+  textbook definition, strict xfail).
 
 ## 0.3.0
 

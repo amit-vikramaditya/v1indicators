@@ -1,5 +1,23 @@
 from ..derived.volume import aobv, swing_leg_profile
-from ..foundational.volume import ad, adl, adosc, cmf, delta_volume, efi, eom, nvi, obv, pvi, pvo, pvol, pvr, pvt, vfi, vp, vpt, vwap
+from ..foundational.volume import (
+    ad,
+    adl,
+    adosc,
+    cmf,
+    delta_volume,
+    efi,
+    eom,
+    nvi,
+    obv,
+    pvi,
+    pvo,
+    pvol,
+    pvr,
+    pvt,
+    vfi,
+    vpt,
+    vwap,
+)
 
 __all__ = [
     "obv",
@@ -19,7 +37,6 @@ __all__ = [
     "pvol",
     "pvr",
     "pvt",
-    "vp",
     "aobv",
     "swing_leg_profile",
 ]

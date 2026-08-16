@@ -13,8 +13,6 @@ the package root is auto-discovered, auto-invoked on synthetic OHLCV data
 by signature introspection, and checked for prefix-invariance.
 
 Known look-ahead by design (documented, intentionally not causal):
-    - ``dpo``: the Detrended Price Oscillator displaces price BACKWARD by
-      length//2+1 bars by definition (visual detrending tool, not a signal).
     - ``ichimoku``: the Chikou span is today's close plotted kijun bars back
       by definition.
 
@@ -236,21 +234,15 @@ def _check_prefix_invariance(func) -> None:
 # ---------------------------------------------------------------------------
 
 KNOWN_LOOKAHEAD = {
-    "dpo": "Detrended Price Oscillator displaces price backward by length//2+1 "
-           "by definition (visual detrending; not a causal signal).",
     "ichimoku": "Chikou span is today's close plotted kijun bars back by "
                 "definition (textbook Ichimoku construction).",
 }
 
 # Whole-window SNAPSHOT functions: their output is a summary of the entire
 # input by definition (not a per-bar indicator), so prefix-invariance does
-# not apply. Documented as snapshots; a trailing-window variant would be the
-# causal alternative if ever needed.
-SNAPSHOT_FUNCTIONS = {
-    "vp": "Volume Profile bins the WHOLE series into `width` chunks; the "
-          "summary intentionally spans all provided bars (snapshot, not a "
-          "per-bar indicator).",
-}
+# not apply. Currently empty — the one snapshot function (vp) was removed
+# in 1.0.0. The mechanism is kept for any future snapshot-style API.
+SNAPSHOT_FUNCTIONS = {}
 
 
 # ---------------------------------------------------------------------------

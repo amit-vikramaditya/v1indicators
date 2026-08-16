@@ -83,7 +83,8 @@ def htf_reversal_divergence(
 ) -> pd.DataFrame:
     """HTF reversal-pattern flags with RSI pivot divergence confirmation.
 
-    Inspired by TradingView file 6, focused on non-visual signal outputs.
+    Higher-timeframe reversal patterns with RSI divergence confirmation,
+    exposed as non-visual per-bar signal outputs.
 
     When `causal=True` (default), RSI pivots and divergence flags are delayed
     to the bar where the pivot is actually confirmed (pivot bar plus

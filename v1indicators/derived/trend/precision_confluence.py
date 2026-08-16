@@ -237,7 +237,7 @@ def precision_confluence(
 ) -> pd.DataFrame:
     """Preset-aware confluence trend signal engine with risk ladder outputs.
 
-    Inspired by TradingView file 4, implemented as a native v1indicators API.
+    Preset-aware confluence trend signal engine with risk ladder outputs.
     """
     if swing_lookback <= 0:
         raise ValueError("swing_lookback must be > 0")

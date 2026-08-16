@@ -31,7 +31,7 @@ def range_filter_confluence(
 ) -> pd.DataFrame:
     """Adaptive range-filter confluence engine with anti-chop gating.
 
-    Inspired by TradingView file 7, implemented as a reusable trend signal API.
+    Adaptive range-filter confluence engine with anti-chop gating.
     """
     if sensitivity <= 0:
         raise ValueError("sensitivity must be > 0")

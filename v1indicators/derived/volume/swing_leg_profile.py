@@ -18,7 +18,7 @@ def swing_leg_profile(
 ) -> pd.DataFrame:
     """Swing-leg volume profile summary metrics.
 
-    Inspired by TradingView file 3, converted to non-visual per-bar profile outputs.
+    Per-bar swing-leg volume profile.
     """
     if swing_length <= 1:
         raise ValueError("swing_length must be > 1")

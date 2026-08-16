@@ -27,7 +27,6 @@ from ..foundational.momentum import (
     cg,
     cmo,
     coppock,
-    dpo,
     ebsw,
     er,
     eri,
@@ -57,4 +56,4 @@ squeeze = squeeze_momentum
 uo = ultimate_oscillator
 willr = williams_r
 
-__all__ = ["ao", "apo", "bias", "bop", "brar", "candle_direction", "candlestick_patterns", "candlestick_patterns_extended", "cci", "cdl_doji", "cdl_inside", "cfo", "cg", "cmo", "coppock", "directional_logistic_oscillator", "dpo", "ebsw", "er", "eri", "fisher", "inertia", "kdj", "kst", "macd", "macd_state", "mfi", "mom", "pgo", "ppo", "psl", "qqe", "qstick", "roc", "rsi", "rsi_bbands_signal", "rsx", "rvgi", "slope", "smi", "squeeze", "squeeze_momentum", "stoch", "stochastic", "stochrsi", "three_line_strike", "trix", "tsi", "ultimate_oscillator", "uo", "wavetrend", "williams_r", "willr"]
+__all__ = ["ao", "apo", "bias", "bop", "brar", "candle_direction", "candlestick_patterns", "candlestick_patterns_extended", "cci", "cdl_doji", "cdl_inside", "cfo", "cg", "cmo", "coppock", "directional_logistic_oscillator", "ebsw", "er", "eri", "fisher", "inertia", "kdj", "kst", "macd", "macd_state", "mfi", "mom", "pgo", "ppo", "psl", "qqe", "qstick", "roc", "rsi", "rsi_bbands_signal", "rsx", "rvgi", "slope", "smi", "squeeze", "squeeze_momentum", "stoch", "stochastic", "stochrsi", "three_line_strike", "trix", "tsi", "ultimate_oscillator", "uo", "wavetrend", "williams_r", "willr"]

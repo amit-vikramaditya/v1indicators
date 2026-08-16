@@ -1,4 +1,4 @@
-"""Tests for the extracted ATR range filter (historical FLOOP core)."""
+"""Tests for the ATR range filter core."""
 
 import numpy as np
 import pandas as pd

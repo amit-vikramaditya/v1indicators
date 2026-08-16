@@ -29,9 +29,9 @@ prefix. Repainting is therefore a test failure, not a surprise.
   `zigzag_swings`, ...) are **causal by default**: levels and signals activate
   only once the pivot is confirmed. `causal=False` restores retrospective
   placement for plotting.
-- Documented exceptions: `dpo` (deprecated; look-ahead by definition),
-  `ichimoku`'s Chikou span (textbook definition), and `vp` (whole-series
-  snapshot semantics).
+- Documented exception: `ichimoku`'s Chikou span (look-ahead by textbook
+  definition). `dpo` and `vp` were removed in 1.0.0 (look-ahead by
+  definition / snapshot semantics).
 
 ## Installation
 

@@ -13,7 +13,6 @@ from .pvol import pvol
 from .pvr import pvr
 from .pvt import pvt
 from .vfi import vfi
-from .vp import vp
 from .vpt import vpt
 from .vwap import vwap
 
@@ -35,5 +34,4 @@ __all__ = [
     "pvol",
     "pvr",
     "pvt",
-    "vp",
 ]

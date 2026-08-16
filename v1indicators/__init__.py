@@ -86,7 +86,6 @@ MOMENTUM_SYMBOLS = (
     "er",
     "pgo",
     "psl",
-    "dpo",
     "slope",
     "cg",
     "cfo",
@@ -187,7 +186,6 @@ VOLUME_SYMBOLS = (
     "pvol",
     "pvr",
     "pvt",
-    "vp",
     "aobv",
     "swing_leg_profile",
 )

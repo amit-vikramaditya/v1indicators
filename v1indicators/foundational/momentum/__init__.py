@@ -13,7 +13,6 @@ from .cfo import cfo
 from .cg import cg
 from .cmo import cmo
 from .coppock import coppock
-from .dpo import dpo
 from .ebsw import ebsw
 from .er import er
 from .eri import eri
@@ -61,7 +60,6 @@ __all__ = [
     "coppock",
     "er",
     "psl",
-    "dpo",
     "slope",
     "cg",
     "cfo",

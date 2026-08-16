@@ -9,8 +9,8 @@ from v1indicators.foundational.overlap.savgol import savgol_weights
 
 
 def test_savgol_weights_match_reference_quadratic_sets():
-    # Parity with the production-hardcoded quadratic endpoint weight sets the
-    # port was derived from (1vcapital): w=5 and w=7, polyorder=2.
+    # Parity with the reference quadratic weight sets (w=5 and w=7,
+    # polyorder=2) this smoother was originally validated against.
     w5 = [-0.08571429, 0.34285714, 0.48571429, 0.34285714, -0.08571429]
     w7 = [-0.0952381, 0.14285714, 0.28571429, 0.33333333,
           0.28571429, 0.14285714, -0.0952381]

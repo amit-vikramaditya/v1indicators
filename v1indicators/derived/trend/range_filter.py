@@ -71,10 +71,8 @@ def range_filter(
     Strictly causal: the recursion at bar i uses only bars <= i. NaN inputs
     carry the previous state forward without emitting a signal.
 
-    Note: this is the standalone core also used by ``range_filter_confluence``;
-    the historical production variant of this filter (FLOOP) used Wilder-RMA
-    ATR — pass ``mamode`` accordingly once RMA ATR is exposed (see ATR
-    docstring for the smoothing-convention discussion).
+    This is the standalone core also used by ``range_filter_confluence``.
+    Uses the same ``mamode`` as ``atr`` (default: Wilder's smoothing).
 
     Parameters
     ----------

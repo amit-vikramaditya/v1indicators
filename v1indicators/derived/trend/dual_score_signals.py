@@ -170,7 +170,7 @@ def dual_score_signals(
 ) -> pd.DataFrame:
     """Dual-score EMA crossover system with ATR ladder targets.
 
-    Inspired by TradingView file 2, reworked into a native reusable indicator.
+    Dual-score (trend + momentum) signal engine.
     """
     if ema_fast <= 0 or ema_slow <= 0:
         raise ValueError("ema_fast and ema_slow must be > 0")
