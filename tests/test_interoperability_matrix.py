@@ -34,6 +34,10 @@ def _build_scenario(name: str, n: int, seed: int) -> pd.DataFrame:
         base = 90.0 + np.linspace(0.0, 20.0, n) + rng.normal(0.0, 0.4, n).cumsum() * 0.06
     elif name == "nan_streaks":
         base = 105.0 + rng.normal(0.0, 1.0, n).cumsum() * 0.1
+    elif name == "weekday_gaps":
+        # Continuous clock, but weekend bars removed afterwards: the shape
+        # real session data has (calendar gaps the continuous scenarios lack).
+        base = 100.0 + np.linspace(0.0, 30.0, n) + rng.normal(0.0, 0.9, n).cumsum() * 0.08
     else:
         raise ValueError(f"unknown scenario {name}")
 
@@ -59,7 +63,7 @@ def _build_scenario(name: str, n: int, seed: int) -> pd.DataFrame:
             low.iloc[start:end] = np.nan
             volume.iloc[start:end] = np.nan
 
-    return pd.DataFrame(
+    frame = pd.DataFrame(
         {
             "open": open_,
             "high": high,
@@ -68,6 +72,9 @@ def _build_scenario(name: str, n: int, seed: int) -> pd.DataFrame:
             "volume": volume,
         }
     )
+    if name == "weekday_gaps":
+        frame = frame[frame.index.dayofweek < 5]
+    return frame
 
 
 def _param_value(name: str, data: pd.DataFrame, annotation: Any) -> Any:
@@ -231,6 +238,7 @@ def _evaluate_interoperability() -> dict[str, Any]:
         "flat",
         "low_volume",
         "nan_streaks",
+        "weekday_gaps",
     ]
     scenarios = {
         scenario_name: _build_scenario(scenario_name, n=640, seed=100 + idx)
