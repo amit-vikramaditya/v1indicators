@@ -53,6 +53,7 @@ OVERLAP_SYMBOLS = (
     "aberration",
     "ma",
     "ssf",
+    "savgol",
 )
 
 MOMENTUM_SYMBOLS = (
@@ -201,6 +202,7 @@ STATISTICS_SYMBOLS = (
     "stdev",
     "fractional_difference",
     "hurst",
+    "variance_regime",
     "variance",
     "zscore",
     "median",

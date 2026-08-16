@@ -1,4 +1,5 @@
 from .accbands import accbands
+from .savgol import savgol
 from .alma import alma
 from .bbands import bbands
 from .dema import dema
@@ -37,43 +38,4 @@ from .wma import wma
 from .zlema import zlema
 from .zlma import zlma
 
-__all__ = [
-    "sma",
-    "ema",
-    "wma",
-    "rma",
-    "hma",
-    "vwma",
-    "dema",
-    "tema",
-    "kama",
-    "zlema",
-    "t3",
-    "tma",
-    "kalman_filter",
-    "smma",
-    "bbands",
-    "donchian",
-    "ichimoku",
-    "alma",
-    "fwma",
-    "hl2",
-    "hlc3",
-    "ohlc4",
-    "midpoint",
-    "midprice",
-    "pwma",
-    "sinwma",
-    "zlma",
-    "trima",
-    "wcp",
-    "swma",
-    "ha",
-    "hilo",
-    "vidya",
-    "accbands",
-    "linreg",
-    "mcgd",
-    "hwma",
-    "ssf",
-]
+__all__ = ["accbands", "alma", "bbands", "dema", "donchian", "ema", "fwma", "ha", "hilo", "hl2", "hlc3", "hma", "hwma", "ichimoku", "kalman_filter", "kama", "linreg", "mcgd", "midpoint", "midprice", "ohlc4", "pwma", "rma", "savgol", "sinwma", "sma", "smma", "ssf", "swma", "t3", "tema", "tma", "trima", "vidya", "vwma", "wcp", "wma", "zlema", "zlma"]
