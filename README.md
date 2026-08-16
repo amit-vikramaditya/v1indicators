@@ -1,28 +1,39 @@
 # v1indicators
 
-Technical analysis indicators for Python. pandas Series in, pandas Series
-or DataFrame out, named and indexed like the input.
+![Tests](https://github.com/Vatthu/v1indicators/actions/workflows/tests.yml/badge.svg)
+![Python](https://img.shields.io/badge/python-3.10%2B-blue)
+![License](https://img.shields.io/badge/license-MIT-green)
 
-The library does indicator math and nothing else. No charting, no broker
+Technical analysis indicators for Python. Pandas Series in, pandas Series or
+DataFrame out — named, typed, and indexed like the input.
+
+The scope is deliberate: indicator math only. No charting, no broker
 integrations, no strategy execution framework.
 
-Requires Python 3.10+, numpy, pandas, numba. MIT licensed.
+---
+
+## Contents
+
+- [Installation](#installation)
+- [Quick start](#quick-start)
+- [Correctness guarantees](#correctness-guarantees)
+- [What is *not* verified](#what-is-not-verified)
+- [Conventions](#conventions)
+- [API layout](#api-layout)
+- [Development](#development)
+
+---
 
 ## Installation
 
-From source:
-
 ```bash
-pip install .
+pip install .            # from a checkout
+pip install -e ".[dev]"  # development install
 ```
 
-For development:
+Requires Python 3.10+, numpy, pandas, numba.
 
-```bash
-pip install -e ".[dev]"
-```
-
-## Example
+## Quick start
 
 ```python
 import pandas as pd
@@ -30,102 +41,113 @@ from v1indicators import rsi, macd, supertrend
 
 df = pd.read_csv("data.csv")
 
+# single output -> named Series
 df["RSI_14"] = rsi(df["close"], length=14)
 
+# multiple outputs -> DataFrame with stable column names
 macd_df = macd(df["close"], fast=12, slow=26, signal=9)
-df = pd.concat([df, macd_df], axis=1)
-
 st_df = supertrend(df["high"], df["low"], df["close"], length=10, mult=3.0)
 ```
 
-Single-output indicators return a named Series. Multi-output indicators
-return a DataFrame with stable uppercase column names
-(`MACD`, `MACD_SIGNAL`, `SUPERTREND_DIR`, ...). Outputs keep the input
-index and length.
+| Output kind | Return type | Example columns |
+|---|---|---|
+| Single value | `pd.Series` | `RSI_14` |
+| Multiple values | `pd.DataFrame` | `MACD`, `MACD_SIGNAL`, `MACD_HIST` |
 
-## What the test suite enforces
+Every output preserves the input index and length.
 
-These properties are checked by tests. A change that breaks one of them
-fails the build, including in CI (Python 3.10/3.12/3.14).
+## Correctness guarantees
 
-No look-ahead bias. An indicator is causal when its values on the first K
-bars are identical whether it is computed on the full series or on a
-truncated prefix of K bars. If appending future bars changes a past value,
-the indicator repaints and any backtest built on it is wrong. Every public
-function is checked this way on several synthetic datasets, and again with
-parameter values pushed away from their defaults
-(`tests/test_causality.py`, `tests/test_causality_params.py`).
+These properties are enforced by tests and CI (Python 3.10 / 3.12 / 3.14).
+A regression in any of them fails the build.
 
-Pivot-based indicators (`support_resistance`, `market_structure`,
-`zigzag_swings`, `trendline_breaks`, ...) emit levels only after the pivot
-bar is confirmed, because a pivot needs `right` future bars of evidence by
-definition. `ichimoku` follows the same rule: the Chikou column is emitted
-as `close - close.shift(kijun)`, which is the information the displaced
-line carries, without future data. Every indicator with a `causal`
-parameter accepts `causal=False` to restore the retrospective textbook
-placement for plotting; that mode repaints by definition, emits a
-`UserWarning` when used, and must not be used for backtests.
+| Property | Enforced by |
+|---|---|
+| No look-ahead bias | `tests/test_causality.py`, `tests/test_causality_params.py` |
+| Textbook formula parity | `tests/test_parity_core.py`, `tests/test_reference_math.py` |
+| NaN warmup boundaries | `tests/test_warmup_contract.py` |
+| Calendar/session correctness | `tests/test_calendar_sessions.py` |
+| Cross-indicator interoperability | `tests/test_interoperability_matrix.py` |
 
-`dpo` and `vp` were removed: both require future bars or whole-series
-snapshots by definition, so no causal form exists.
+### No look-ahead bias
 
-Correct formulas. About thirty core indicators (the moving-average family,
-Bollinger Bands, Donchian, MACD, Stochastic, Williams %R, CMO, Ultimate,
-Aroon, ADX, PSAR, ATR, Parkinson, Garman-Klass, Choppiness,
-OBV, AD, CMF, VWAP, rolling statistics) are compared against plain-Python
-reference loops written from their textbook formulas at 1e-9 tolerance
-(`tests/test_parity_core.py`, `tests/test_reference_math.py`). The
-seeding and warmup conventions these tests pin are documented in the test
-files.
+An indicator is causal when its values on the first *K* bars are identical
+whether it is computed on the full series or on a truncated *K*-bar prefix.
+If appending future bars changes a past value, the indicator repaints and
+any backtest built on it is wrong.
 
-NaN warmup. Rolling-window and exponential-family outputs (`ema`, `rma`,
-`smma`, `zlema`, `dema`, `tema`, `t3`, and the ewm-smoothed oscillators)
-are NaN until they have `length` valid observations; nested chains add
-their stages (TEMA is NaN for `3*(length-1)` bars). This is pinned in
-`tests/test_warmup_contract.py`. Exception: the kernel-based adaptive
-averages (`kama`, `vidya`, `mcgd`, `ssf`, `hwma`, `kalman_filter`) and
-`psar` seed their recursion from the first bars, which is part of how
-those algorithms are defined; feed warmup history before the region you
-care about.
+- Every public function is checked this way on several synthetic datasets,
+  and again with parameters pushed away from their defaults.
+- Pivot-based indicators (`support_resistance`, `market_structure`,
+  `zigzag_swings`, ...) emit levels only after the pivot is confirmed —
+  a pivot needs `right` bars of future evidence by definition.
+- `ichimoku` follows the same rule: its Chikou column is emitted as
+  `close - close.shift(kijun)`, carrying the same information without
+  future data.
+- Indicators with a `causal` parameter accept `causal=False` for
+  retrospective textbook placement (plotting only). That mode repaints by
+  definition and emits a `UserWarning`.
+- `dpo` and `vp` were removed: no causal form of either exists.
 
-Calendar correctness. Levels and session tools are tested on weekday-only
-indices with weekend gaps and holidays (`tests/test_calendar_sessions.py`),
-which is the shape real exchange data has.
+### Textbook formula parity
 
-Interoperability. Every public symbol runs on nine synthetic scenarios
-(trend up/down, sideways, volatile, gapped, flat, low volume, NaN streaks,
-weekday gaps) and all outputs must align on index and length
-(`tests/test_interoperability_matrix.py`).
+About thirty core indicators — the moving-average family, Bollinger Bands,
+Donchian, MACD, Stochastic, Williams %R, CMO, Ultimate Oscillator, Aroon,
+ADX, PSAR, ATR, Parkinson, Garman-Klass, Choppiness, OBV, AD, CMF, VWAP,
+and rolling statistics — are compared against plain-Python reference loops
+written from their textbook formulas, at 1e-9 tolerance.
 
-## What the tests do not tell you
+### NaN warmup
+
+Rolling-window and exponential-family outputs (`ema`, `rma`, `smma`,
+`zlema`, `dema`, `tema`, `t3`, and the ewm-smoothed oscillators) are NaN
+until they have `length` valid observations. Nested chains add their
+stages: TEMA is NaN for `3*(length-1)` bars.
+
+Exception: the kernel-based adaptive averages (`kama`, `vidya`, `mcgd`,
+`ssf`, `hwma`, `kalman_filter`) and `psar` seed their recursion from the
+first bars, as their algorithms define. Feed warmup history before the
+region you care about.
+
+### Calendar and session correctness
+
+Level and session tools are tested on weekday-only indices with weekend
+gaps and holidays — the shape real exchange data has.
+
+### Interoperability
+
+Every public symbol runs on nine synthetic scenarios (trend up/down,
+sideways, volatile, gapped, flat, low volume, NaN streaks, weekday gaps);
+outputs must align on index and length.
+
+## What is *not* verified
 
 `range_filter_confluence`, `precision_confluence`, `dual_score_signals`,
 `htf_reversal_divergence`, `swing_trend_entry` and `swing_leg_profile`
-compose the indicators above into buy/sell signals. Their outputs are
-causal, and that is all this library claims about them. Nothing here
-measures whether their signals predict anything. Validate on your own
-data before trading them.
+compose the indicators above into buy/sell signals.
+
+Their outputs are causal by construction. That is all this library claims
+about them — nothing here measures whether their signals predict anything.
+Validate on your own data before trading them.
 
 ## Conventions
 
-- Warmup: NaN until enough history, as described above.
-- Input index must be sorted ascending; otherwise `ValueError`. Bar i+1
-  is assumed to follow bar i.
-- Boolean flag columns are `False` where inputs are NaN or insufficient.
-  "No signal" and "not enough data" are not distinguished.
-- Session and calendar tools (`day_week_month_levels`, `session_range`,
-  `session_killzones`) read timestamps in the index's own clock; there is
-  no timezone conversion. Calendar periods without data are skipped, so
-  "prior day" means the prior trading day.
-- `vwap` accumulates from the first bar of the input. Slice the input to
-  a session if you want a session VWAP.
-- Aliases: `kc` = `keltner`, `squeeze` = `squeeze_momentum`,
+- **Sorted input required** — an unsorted index raises `ValueError`; bar
+  *i+1* is always assumed to follow bar *i*.
+- **Boolean flags** are `False` where inputs are NaN or insufficient;
+  "no signal" and "not enough data" are not distinguished.
+- **Session/calendar tools** (`day_week_month_levels`, `session_range`,
+  `session_killzones`) read timestamps in the index's own clock — no
+  timezone conversion. Empty calendar periods are skipped, so "prior day"
+  means the prior *trading* day.
+- **`vwap`** accumulates from the first bar of the input; slice the input
+  to a session for a session VWAP.
+- **Aliases**: `kc` = `keltner`, `squeeze` = `squeeze_momentum`,
   `uo` = `ultimate_oscillator`, `willr` = `williams_r`.
 
 ## API layout
 
-Eight families: overlap, momentum, trend, volatility, volume, statistics,
-levels, performance. Import from the root:
+Import from the root:
 
 ```python
 from v1indicators import ema, sma, rsi, atr, obv
@@ -137,47 +159,41 @@ or from a family module:
 from v1indicators.momentum import rsi, stoch
 ```
 
-There is also a two-layer namespace reflecting how indicators are built:
-`v1indicators.foundational.*` (computed directly from price/volume) and
-`v1indicators.derived.*` (built on other indicators):
+| Family | Symbols | Examples |
+|---|---:|---|
+| overlap | 43 | `ema`, `sma`, `bbands`, `donchian`, `keltner` |
+| momentum | 52 | `rsi`, `macd`, `stochastic`, `williams_r` |
+| trend | 38 | `supertrend`, `adx`, `psar`, `aroon` |
+| volatility | 13 | `atr`, `parkinson`, `garman_klass`, `chop` |
+| volume | 17 | `obv`, `ad`, `cmf`, `vwap`, `pvt` |
+| statistics | 11 | `stdev`, `zscore`, `hurst`, `entropy` |
+| levels | 4 | `support_resistance`, `pivot_points` |
+| performance | 4 | `log_return`, `drawdown` |
+
+A second namespace mirrors how indicators are built:
 
 ```python
-from v1indicators.foundational.overlap import ema
-from v1indicators.derived.trend import supertrend
+from v1indicators.foundational.overlap import ema   # direct from price/volume
+from v1indicators.derived.trend import supertrend   # built on other indicators
 ```
 
-The family modules are the compatibility surface and re-export both
-layers. New work incubates in `experimental/`, which is not shipped to
-PyPI.
+Family modules re-export both layers and remain the compatibility surface.
+New work incubates in `experimental/`, which is not shipped to PyPI.
 
 Most indicators take close only; range-based ones take high/low/close;
 volume indicators add volume. Series must share an index.
 
 ## Development
 
-Run the tests:
-
 ```bash
-pytest
-```
-
-Individual gates:
-
-```bash
+pytest                                     # full suite (~7 s)
 pytest -q tests/test_causality.py          # prefix invariance, all functions
 pytest -q tests/test_causality_params.py   # same, non-default parameters
 pytest -q tests/test_parity_core.py        # textbook reference parity
 pytest -q tests/test_interoperability_matrix.py
 ```
 
-New indicators are expected to pass all of the above without exceptions;
-the causality gates discover public functions automatically, so a new
-repainting indicator fails without any test being written for it.
+The causality gates discover public functions automatically: a new
+repainting indicator fails the suite without a test being written for it.
 
-## Changelog
-
-See [CHANGELOG.md](CHANGELOG.md).
-
-## License
-
-MIT
+See [CHANGELOG.md](CHANGELOG.md) for release history. License: MIT.
