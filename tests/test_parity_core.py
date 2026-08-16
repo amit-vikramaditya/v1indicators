@@ -526,3 +526,34 @@ def test_parity_stdev_zscore():
     z = (x - mean) / sd0
     _assert_valid_close(stdev(close, length=n, ddof=0).to_numpy(), sd0)
     _assert_valid_close(zscore(close, length=n, ddof=0).to_numpy(), np.where(sd0 != 0, z, np.nan))
+
+
+def test_parity_skew_kurtosis():
+    """G1/G2 must match both a naive loop AND pandas' own rolling estimators
+    (~1e-12), while being per-window deterministic — pandas' online
+    accumulator is not prefix-invariant on pandas 2.x."""
+    from v1indicators import kurtosis, skew
+    close = _close(seed=9)
+    n = 20
+    x = close.to_numpy()
+
+    skew_ref = np.full(N, np.nan)
+    kurt_ref = np.full(N, np.nan)
+    for i in range(n - 1, N):
+        w = x[i - n + 1 : i + 1]
+        d = w - w.mean()
+        m2 = (d * d).mean()
+        m3 = (d * d * d).mean()
+        m4 = (d * d * d * d).mean()
+        if m2 > 0:
+            g1 = m3 / m2**1.5
+            skew_ref[i] = g1 * np.sqrt(n * (n - 1.0)) / (n - 2.0)
+            g2 = m4 / (m2 * m2) - 3.0
+            kurt_ref[i] = ((n - 1.0) / ((n - 2.0) * (n - 3.0))) * ((n + 1.0) * g2 + 6.0)
+
+    _assert_valid_close(skew(close, length=n).to_numpy(), skew_ref)
+    _assert_valid_close(kurtosis(close, length=n).to_numpy(), kurt_ref)
+    _assert_valid_close(skew(close, length=n).to_numpy(),
+                        close.rolling(n).skew().to_numpy(), atol=1e-9)
+    _assert_valid_close(kurtosis(close, length=n).to_numpy(),
+                        close.rolling(n).kurt().to_numpy(), atol=1e-9)
