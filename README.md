@@ -23,15 +23,37 @@ The goal is simple: reliable indicator math on top of pandas Series/DataFrame in
 
 Every per-bar indicator is tested for **prefix invariance**: its values on the
 first K bars are identical whether computed on the full series or a truncated
-prefix. Repainting is therefore a test failure, not a surprise.
+prefix. Repainting is therefore a test failure, not a surprise. The gate runs
+over multiple synthetic seeds and sweeps non-default parameter values.
 
 - Pivot-family indicators (`support_resistance`, `market_structure`,
   `zigzag_swings`, ...) are **causal by default**: levels and signals activate
   only once the pivot is confirmed. `causal=False` restores retrospective
   placement for plotting.
-- Documented exception: `ichimoku`'s Chikou span (look-ahead by textbook
-  definition). `dpo` and `vp` were removed in 1.0.0 (look-ahead by
-  definition / snapshot semantics).
+- `ichimoku` is causal by default as well: the Chikou column is emitted as the
+  spread it encodes (`close - close.shift(kijun)`); the textbook displaced
+  form is available via `causal=False` (plotting only). There are **no
+  permitted look-ahead exceptions** in the public API.
+- `dpo` and `vp` were removed in 1.0.0 (look-ahead by definition / snapshot
+  semantics).
+
+## Conventions worth knowing
+
+- **Warmup**: exponential-family indicators (`ema`, `rma`, `smma`, `tema`,
+  `t3`, ...) emit values from bar 0 (pandas `ewm` convention) rather than
+  returning NaN until `length` bars have elapsed; rolling-window indicators
+  are NaN until their window fills. Early exponential values are a warmup
+  transient, not converged estimates.
+- **Boolean outputs**: flag columns are `False` when inputs are NaN/insufficient
+  — "no signal" and "not enough data" are not distinguished.
+- **Session/calendar tools** (`day_week_month_levels`, `session_range`,
+  `session_killzones`) interpret timestamps in the index's own clock (no
+  timezone conversion) and skip empty calendar periods: "prior day" means the
+  prior *trading* day.
+- **`vwap`** is cumulative from the first bar of the input (anchored VWAP);
+  slice to a session for a session VWAP.
+- **Aliases**: `kc` = `keltner`, `squeeze` = `squeeze_momentum`,
+  `uo` = `ultimate_oscillator`, `willr` = `williams_r`.
 
 ## Installation
 

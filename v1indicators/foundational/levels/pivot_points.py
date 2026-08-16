@@ -11,8 +11,12 @@ def pivot_points(
     method: str = "classic",
 ) -> pd.DataFrame:
     """
-    Pivot point levels based on prior bar values.
+    Rolling pivot point levels from the PRIOR BAR's high/low/close.
 
+    NOTE: pivots here recompute every bar from the immediately preceding
+    bar (shift(1) of H/L/C), not from a prior session/day. Classic floor-
+    trader pivots use the previous DAY's H/L/C; to replicate those, feed
+    this function daily-resampled OHLC. Strictly causal.
     Supported methods: classic, fibonacci, woodie, camarilla.
     """
     method_l = method.lower()

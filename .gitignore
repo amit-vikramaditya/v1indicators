@@ -30,6 +30,3 @@ reports/
 .python-version
 .env
 .env.*
-
-# GitHub metadata is intentionally not used in this repo
-.github/

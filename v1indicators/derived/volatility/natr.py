@@ -6,7 +6,12 @@ from ...foundational.volatility.atr import atr
 
 
 def natr(high: pd.Series, low: pd.Series, close: pd.Series, length: int = 14) -> pd.Series:
-    """Normalized ATR: 100 * ATR / close."""
+    """Normalized ATR: 100 * ATR / close.
+
+    Uses the pre-1.0 span-EMA ATR convention (``mamode="ema"``), pinned
+    deliberately to keep this output scale-comparable with historical use;
+    pass ``atr(..., mamode="rma")`` yourself if you need Wilder ATR.
+    """
     if length <= 0:
         raise ValueError("length must be > 0")
 

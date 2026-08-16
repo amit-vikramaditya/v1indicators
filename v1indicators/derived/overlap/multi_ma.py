@@ -50,7 +50,8 @@ def multi_ma(
     """
     Multi-MA engine with crossover and slope-state flags.
 
-    Inspired by TradingView "ultimate MA" style overlays.
+    Two configurable moving averages with cross detection, per-MA slope
+    state and a combined trend column.
     """
     if length1 <= 0 or length2 <= 0:
         raise ValueError("length1 and length2 must be > 0")

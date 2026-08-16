@@ -72,7 +72,10 @@ def range_filter(
     carry the previous state forward without emitting a signal.
 
     This is the standalone core also used by ``range_filter_confluence``.
-    Uses the same ``mamode`` as ``atr`` (default: Wilder's smoothing).
+    NOTE: unlike ``atr`` itself (default ``mamode="rma"`` since 1.0.0), this
+    filter pins ``mamode="ema"`` by default — the pre-1.0 smoothing the
+    confluence engines were tuned against. Pass ``mamode="rma"`` for Wilder
+    ATR band widths.
 
     Parameters
     ----------

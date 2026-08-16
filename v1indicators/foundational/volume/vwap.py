@@ -8,7 +8,14 @@ def vwap(
     close: pd.Series,
     volume: pd.Series,
 ) -> pd.Series:
-    """Volume Weighted Average Price (cumulative VWAP)."""
+    """Volume Weighted Average Price, cumulative from the first bar of the input.
+
+    ANCHOR SEMANTICS: this is an anchored (cumulative) VWAP. There is no
+    automatic daily/session reset — the anchor is wherever the supplied
+    series starts, so prepending history changes every value. For a
+    session VWAP, slice the input to the session before calling.
+    Strictly causal: bar i uses bars <= i only.
+    """
 
     high = check_series(high, "high")
     low = check_series(low, "low")

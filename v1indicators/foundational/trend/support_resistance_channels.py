@@ -94,8 +94,8 @@ def support_resistance_channels(
     """
     Support/Resistance channels from pivot clustering.
 
-    Inspired by TradingView support-resistance channel logic, adapted for
-    calculation-only API: strongest resistance above and support below price.
+    Clusters recent confirmed pivots into price bands and reports the
+    strongest resistance above and support below the current price.
 
     Pivot clustering over recent anchors for the strongest levels.
 
