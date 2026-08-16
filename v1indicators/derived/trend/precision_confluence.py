@@ -26,7 +26,9 @@ _PRESETS = {
     "crypto-24-7": (9, 21, 55, 14, 20, 5, 2.0),
 }
 
+# Multiplier for higher-timeframe (HTF) trend bias contribution in the confluence score.
 HTF_BIAS_WEIGHT = 1.5
+# Additional weight for fast-EMA directional alignment when composing the score.
 FAST_EMA_WEIGHT = 0.5
 
 def _resolve_profile(
@@ -230,6 +232,8 @@ def precision_confluence(
     use_structure_sl: bool = True,
     swing_lookback: int = 10,
     htf_step: int = 5,
+    htf_bias_weight: float = HTF_BIAS_WEIGHT,
+    fast_ema_weight: float = FAST_EMA_WEIGHT,
 ) -> pd.DataFrame:
     """Preset-aware confluence trend signal engine with risk ladder outputs.
 
@@ -264,9 +268,13 @@ def precision_confluence(
     ema_trend_s = ema(close_s, et)
     atr_s = atr(high_s, low_s, close_s, length=al)
     rsi_s = rsi(close_s, length=rl)
+    macd_slow = 26
+    macd_signal = 9
     macd_df = macd(close_s)
-    adx_df = adx(high_s, low_s, close_s, length=14)
-    vol_sma = sma(volume_s, 20)
+    adx_len = 14
+    adx_df = adx(high_s, low_s, close_s, length=adx_len)
+    vol_sma_len = 20
+    vol_sma = sma(volume_s, vol_sma_len)
     vwap_s = vwap(high_s, low_s, close_s, volume_s)
 
     reduced_close, groups = _resample_last(close_s, htf_step)
@@ -293,8 +301,8 @@ def precision_confluence(
         + (close_s > vwap_s).astype(np.float64)
         + (volume_s > vol_sma).astype(np.float64)
         + ((adx_df[adx_col] > 20.0) & (adx_df[dmp_col] > adx_df[dmn_col])).astype(np.float64)
-        + (htf_bias == 1).astype(np.float64) * HTF_BIAS_WEIGHT  # Heavier weight: higher-timeframe trend alignment is treated as a stronger directional filter.
-        + (close_s > ema_fast_s).astype(np.float64) * FAST_EMA_WEIGHT  # Lighter weight: fast-EMA position is a short-term confirmation signal, not a primary driver.
+        + (htf_bias == 1).astype(np.float64) * htf_bias_weight  # Heavier weight: higher-timeframe trend alignment is treated as a stronger directional filter.
+        + (close_s > ema_fast_s).astype(np.float64) * fast_ema_weight  # Lighter weight: fast-EMA position is a short-term confirmation signal, not a primary driver.
     )
 
     bear_score = (
@@ -306,8 +314,8 @@ def precision_confluence(
         + (close_s < vwap_s).astype(np.float64)
         + (volume_s > vol_sma).astype(np.float64)
         + ((adx_df[adx_col] > 20.0) & (adx_df[dmn_col] > adx_df[dmp_col])).astype(np.float64)
-        + (htf_bias == -1).astype(np.float64) * HTF_BIAS_WEIGHT  # Mirror of bull_score: emphasize higher-timeframe bearish alignment.
-        + (close_s < ema_fast_s).astype(np.float64) * FAST_EMA_WEIGHT  # Mirror of bull_score: keep fast-EMA relation as secondary confirmation.
+        + (htf_bias == -1).astype(np.float64) * htf_bias_weight  # Mirror of bull_score: emphasize higher-timeframe bearish alignment.
+        + (close_s < ema_fast_s).astype(np.float64) * fast_ema_weight  # Mirror of bull_score: keep fast-EMA relation as secondary confirmation.
     )
 
     ema_bull_cross = (ema_fast_s > ema_slow_s) & (ema_fast_s.shift(1) <= ema_slow_s.shift(1))
@@ -322,7 +330,18 @@ def precision_confluence(
     raw_buy_np = raw_buy.to_numpy(dtype=bool, copy=False)
     raw_sell_np = raw_sell.to_numpy(dtype=bool, copy=False)
 
-    warmup = max(et, _MIN_WARMUP_BARS)
+    warmup = max(
+        _MIN_WARMUP_BARS,
+        ef,
+        es,
+        et,
+        rl,
+        macd_slow,
+        macd_signal,
+        adx_len,
+        vol_sma_len,
+        swing_lookback,
+    )
     buy = np.zeros(len(close_s), dtype=bool)
     sell = np.zeros(len(close_s), dtype=bool)
     last_dir = 0

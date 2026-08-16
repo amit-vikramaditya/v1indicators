@@ -4,7 +4,15 @@ from .._utils import check_series
 
 
 def ttm_trend(open_: pd.Series, high: pd.Series, low: pd.Series, close: pd.Series, length: int = 6) -> pd.Series:
-    """TTM Trend color state approximation."""
+    """TTM Trend color state approximation.
+
+    Notes:
+        This implementation uses an HLC-based approximation:
+        ``basis = SMA((high + low + close) / 3, length)``.
+        The ``open_`` input is intentionally accepted and validated for
+        OHLC API consistency/alignment checks, but it is not used directly
+        in the calculation.
+    """
     if length <= 0:
         raise ValueError("length must be > 0")
 
