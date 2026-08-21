@@ -1,16 +1,37 @@
+<!-- ======================================================================
+     BANNER PLACEHOLDER
+     Drop a wide banner image at docs/assets/banner.png and uncomment the
+     <img> tag below. Until then the centered title acts as the masthead.
+======================================================================= -->
+
+<div align="center">
+
+<!-- <img src="docs/assets/banner.png" alt="v1indicators" width="720"> -->
+
 # v1indicators
 
-![Tests](https://github.com/Vatthu/v1indicators/actions/workflows/tests.yml/badge.svg)
+**Technical analysis indicators for Python**
+
+Pandas Series in, pandas Series or DataFrame out — named, typed, and
+indexed like the input.
+
+[![Tests](https://github.com/Vatthu/v1indicators/actions/workflows/tests.yml/badge.svg)](https://github.com/Vatthu/v1indicators/actions/workflows/tests.yml)
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-Technical analysis indicators for Python. Pandas Series in, pandas Series or
-DataFrame out — named, typed, and indexed like the input.
+</div>
+
+---
+
+<div align="center">
+  <img src="docs/assets/quickstart.png" alt="supertrend and RSI computed on synthetic OHLC data" width="820">
+  <p><sub><code>supertrend(high, low, close, length=10, mult=3.0)</code> and <code>rsi(close, length=14)</code>
+  on synthetic data · generated with matplotlib by
+  <a href="docs/assets/make_example_chart.py">docs/assets/make_example_chart.py</a></sub></p>
+</div>
 
 The scope is deliberate: indicator math only. No charting, no broker
 integrations, no strategy execution framework.
-
----
 
 ## Contents
 
@@ -21,8 +42,6 @@ integrations, no strategy execution framework.
 - [Conventions](#conventions)
 - [API layout](#api-layout)
 - [Development](#development)
-
----
 
 ## Installation
 
@@ -69,10 +88,11 @@ of them fails the build.
 | Calendar correctness | Day/week/month and session levels are right on gapped exchange calendars | `test_calendar_sessions.py` |
 | Interoperability | All outputs align on index and length across nine scenarios | `test_interoperability_matrix.py` |
 
-### No look-ahead bias
+<details>
+<summary><strong>No look-ahead bias</strong> — how the suite rules out repainting</summary>
 
 An indicator that changes its past values when future bars arrive repaints,
-and any backtest built on it is wrong. The suite rules this out:
+and any backtest built on it is wrong.
 
 - Every public function is checked on several synthetic datasets.
 - The check repeats under non-default parameter values.
@@ -81,14 +101,20 @@ and any backtest built on it is wrong. The suite rules this out:
 - `causal=False` (retrospective plotting mode) repaints by definition and raises a `UserWarning`.
 - `dpo` and `vp` were removed: no causal form of either exists.
 
-### Textbook parity
+</details>
+
+<details>
+<summary><strong>Textbook parity</strong> — what is compared against reference loops</summary>
 
 Covers the moving-average family, Bollinger Bands, Donchian, MACD,
 Stochastic, Williams %R, CMO, Ultimate, Aroon, ADX, PSAR, ATR, Parkinson,
 Garman-Klass, Choppiness, OBV, AD, CMF, VWAP and rolling statistics — each
 compared against a plain-Python loop written from its textbook formula.
 
-### NaN warmup
+</details>
+
+<details>
+<summary><strong>NaN warmup</strong> — how much history each output needs</summary>
 
 Outputs are NaN until enough history exists for the value to mean something.
 
@@ -96,11 +122,14 @@ Outputs are NaN until enough history exists for the value to mean something.
 - Nested chains add up: TEMA needs `3*(length-1)` bars, MACD signal `slow+signal-2`.
 - Kernel-based averages (`kama`, `vidya`, `mcgd`, `ssf`, `hwma`, `kalman_filter`) and `psar` seed from the first bars by algorithm definition — feed warmup history.
 
-## What is not verified
+</details>
 
-Six indicators compose the primitives above into trading signals. Their
-outputs are causal by construction — that is all this library claims about
-them. Nothing here measures whether their signals predict anything.
+## What is *not* verified
+
+> [!WARNING]
+> Six indicators compose the primitives above into trading signals. Their
+> outputs are causal by construction — that is all this library claims about
+> them. Nothing here measures whether their signals predict anything.
 
 | Signal engine | Output |
 |---|---|
@@ -156,12 +185,17 @@ from v1indicators.derived.trend import supertrend   # built on other indicators
 ```
 
 Family modules re-export both layers and remain the compatibility surface.
-New work incubates in `experimental/`, which is not shipped to PyPI.
+
+> [!NOTE]
+> New work incubates in `experimental/`, which is not shipped to PyPI.
 
 Most indicators take close only; range-based ones take high/low/close;
 volume indicators add volume. Series must share an index.
 
 ## Development
+
+<details>
+<summary><strong>Test commands</strong></summary>
 
 ```bash
 pytest                                     # full suite (~7 s)
@@ -171,7 +205,10 @@ pytest -q tests/test_parity_core.py        # textbook reference parity
 pytest -q tests/test_interoperability_matrix.py
 ```
 
-The causality gates discover public functions automatically: a new
-repainting indicator fails the suite without a test being written for it.
+</details>
+
+> [!IMPORTANT]
+> The causality gates discover public functions automatically: a new
+> repainting indicator fails the suite without a test being written for it.
 
 See [CHANGELOG.md](CHANGELOG.md) for release history. License: MIT.
