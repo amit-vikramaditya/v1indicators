@@ -1,6 +1,13 @@
 # Changelog
 
-## 1.0.0 — Causality Release (unreleased on PyPI; latest published: 0.3.0)
+## 1.0.1 — Dual-Surface Documentation & Asset Parity
+
+- **Dual-surface documentation architecture:** Converted all relative media and repository links in `README.md` to absolute URLs (`raw.githubusercontent.com` and `github.com/Vatthu/v1indicators`), resolving broken image previews and 404 links on PyPI.
+- **Universal markdown formatting:** Replaced platform-specific alert macros with universal semantic callouts that render cleanly across PyPI (Warehouse / CommonMark), GitHub, and IDEs.
+- **Package-first installation:** Restructured the installation instructions to highlight `pip install v1indicators` first, with developer checkout commands secondary.
+- **Badge additions:** Added live PyPI package badge linking directly to package releases.
+
+## 1.0.0 — Causality Release
 
 The headline change of 1.0.0: **every per-bar indicator in this library is now
 verified free of look-ahead bias by an automated prefix-invariance harness**

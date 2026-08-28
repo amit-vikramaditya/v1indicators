@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "v1indicators"
-version = "1.0.0"
+version = "1.0.1"
 description = "Technical analysis indicators and scanners."
 readme = "README.md"
 requires-python = ">=3.10"

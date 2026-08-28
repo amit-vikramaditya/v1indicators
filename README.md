@@ -6,28 +6,28 @@
 
 <div align="center">
 
-<!-- <img src="docs/assets/banner.png" alt="v1indicators" width="720"> -->
+<!-- <img src="https://raw.githubusercontent.com/Vatthu/v1indicators/main/docs/assets/banner.png" alt="v1indicators" width="720"> -->
 
 # v1indicators
 
 **Technical analysis indicators for Python**
 
-Pandas Series in, pandas Series or DataFrame out — named, typed, and
-indexed like the input.
+Pandas Series in, pandas Series or DataFrame out — named, typed, and indexed like the input.
 
+[![PyPI Version](https://img.shields.io/pypi/v/v1indicators.svg)](https://pypi.org/project/v1indicators/)
 [![Tests](https://github.com/Vatthu/v1indicators/actions/workflows/tests.yml/badge.svg)](https://github.com/Vatthu/v1indicators/actions/workflows/tests.yml)
-![Python](https://img.shields.io/badge/python-3.10%2B-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
+[![Python Version](https://img.shields.io/pypi/pyversions/v1indicators.svg)](https://pypi.org/project/v1indicators/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://github.com/Vatthu/v1indicators/blob/main/LICENSE)
 
 </div>
 
 ---
 
 <div align="center">
-  <img src="docs/assets/quickstart.png" alt="supertrend and RSI computed on synthetic OHLC data" width="820">
+  <img src="https://raw.githubusercontent.com/Vatthu/v1indicators/main/docs/assets/quickstart.png" alt="supertrend and RSI computed on synthetic OHLC data" width="820">
   <p><sub><code>supertrend(high, low, close, length=10, mult=3.0)</code> and <code>rsi(close, length=14)</code>
   on synthetic data · generated with matplotlib by
-  <a href="docs/assets/make_example_chart.py">docs/assets/make_example_chart.py</a></sub></p>
+  <a href="https://github.com/Vatthu/v1indicators/blob/main/docs/assets/make_example_chart.py">docs/assets/make_example_chart.py</a></sub></p>
 </div>
 
 The scope is deliberate: indicator math only. No charting, no broker
@@ -38,16 +38,25 @@ integrations, no strategy execution framework.
 - [Installation](#installation)
 - [Quick start](#quick-start)
 - [Correctness guarantees](#correctness-guarantees)
-- [What is *not* verified](#what-is-not-verified)
+- [What is not verified](#what-is-not-verified)
 - [Conventions](#conventions)
 - [API layout](#api-layout)
 - [Development](#development)
 
 ## Installation
 
+Install from PyPI:
+
 ```bash
-pip install .            # from a checkout
-pip install -e ".[dev]"  # development install
+pip install v1indicators
+```
+
+Or install from source for development:
+
+```bash
+git clone https://github.com/Vatthu/v1indicators.git
+cd v1indicators
+pip install -e ".[dev]"
 ```
 
 Requires Python 3.10+, numpy, pandas, numba.
@@ -124,10 +133,9 @@ Outputs are NaN until enough history exists for the value to mean something.
 
 </details>
 
-## What is *not* verified
+## What is not verified
 
-> [!WARNING]
-> Six indicators compose the primitives above into trading signals. Their
+> ⚠️ **Warning:** Six indicators compose the primitives above into trading signals. Their
 > outputs are causal by construction — that is all this library claims about
 > them. Nothing here measures whether their signals predict anything.
 
@@ -186,8 +194,7 @@ from v1indicators.derived.trend import supertrend   # built on other indicators
 
 Family modules re-export both layers and remain the compatibility surface.
 
-> [!NOTE]
-> New work incubates in `experimental/`, which is not shipped to PyPI.
+> ℹ️ **Note:** New work incubates in `experimental/` in the repository, which is not shipped in the binary PyPI package.
 
 Most indicators take close only; range-based ones take high/low/close;
 volume indicators add volume. Series must share an index.
@@ -207,8 +214,7 @@ pytest -q tests/test_interoperability_matrix.py
 
 </details>
 
-> [!IMPORTANT]
-> The causality gates discover public functions automatically: a new
+> 🛡️ **Guarantees:** The causality gates discover public functions automatically: a new
 > repainting indicator fails the suite without a test being written for it.
 
-See [CHANGELOG.md](CHANGELOG.md) for release history. License: MIT.
+See [CHANGELOG.md](https://github.com/Vatthu/v1indicators/blob/main/CHANGELOG.md) for full release history. License: [MIT](https://github.com/Vatthu/v1indicators/blob/main/LICENSE).
